@@ -255,6 +255,9 @@ function FeaturesEditor({ tenant, onSaved }: { tenant: Tenant; onSaved: () => vo
 
 /* ─── Domain ─────────────────────────────────────────── */
 
+const PLATFORM_HOSTNAME = "adarsh21ch-nevoraiapps.socialwiire.workers.dev";
+const PLATFORM_WILDCARD_SUFFIX = ".nevorai.com";
+
 function DomainEditor({ tenant, onSaved }: { tenant: Tenant; onSaved: () => void }) {
   const [domain, setDomain] = useState(tenant.custom_domain ?? "");
   const save = useMutation({
@@ -266,31 +269,47 @@ function DomainEditor({ tenant, onSaved }: { tenant: Tenant; onSaved: () => void
     onSuccess: () => { toast.success("Domain saved"); onSaved(); },
     onError: (e: Error) => toast.error(e.message),
   });
+
+  const d = domain.trim().toLowerCase();
+  const isWildcardCovered = d.endsWith(PLATFORM_WILDCARD_SUFFIX) && d !== PLATFORM_WILDCARD_SUFFIX.slice(1);
+  const hostForCname = d ? (d.split(".").length <= 2 ? "@" : d.split(".").slice(0, -2).join(".")) : "app";
+
   return (
     <Panel title={<span className="flex items-center gap-2"><Globe className="size-4" /> Custom domain</span>}>
       <PField label="Domain (e.g. app.kirklandcricket.in)" value={domain} onChange={setDomain} />
-      <div className="rounded-md border border-white/10 bg-neutral-950 p-3 text-xs text-neutral-300 space-y-1.5">
-        <div className="font-semibold text-white flex items-center gap-1"><Info className="size-3" /> DNS instructions to send the client</div>
-        <p>At their DNS provider, add this <strong>A record</strong>:</p>
-        <pre className="bg-neutral-900 rounded p-2 overflow-x-auto text-[11px]">
-          Type: A{"\n"}Host: {domain ? hostPart(domain) : "app"}{"\n"}Value: 185.158.133.1{"\n"}TTL: 3600
-        </pre>
-        <p>Then a <strong>TXT record</strong> for verification:</p>
-        <pre className="bg-neutral-900 rounded p-2 overflow-x-auto text-[11px]">
-          Type: TXT{"\n"}Host: _lovable{"\n"}Value: lovable_verify=&lt;paste from Lovable Publish dialog&gt;
-        </pre>
-        <p className="text-neutral-400">Once DNS propagates, add this exact domain in Project Settings → Domains in Lovable to issue SSL.</p>
-      </div>
+
+      {isWildcardCovered ? (
+        <div className="rounded-md border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs text-emerald-200 space-y-1.5">
+          <div className="font-semibold text-emerald-100 flex items-center gap-1">
+            <Info className="size-3" /> No DNS setup needed
+          </div>
+          <p>
+            <strong>{d}</strong> is already covered by the platform's <code className="bg-black/30 px-1 rounded">*{PLATFORM_WILDCARD_SUFFIX}</code> wildcard. Just save — it goes live immediately.
+          </p>
+        </div>
+      ) : (
+        <div className="rounded-md border border-white/10 bg-neutral-950 p-3 text-xs text-neutral-300 space-y-1.5">
+          <div className="font-semibold text-white flex items-center gap-1">
+            <Info className="size-3" /> DNS instructions to send the client
+          </div>
+          <p>At their DNS provider, add this <strong>CNAME record</strong>:</p>
+          <pre className="bg-neutral-900 rounded p-2 overflow-x-auto text-[11px]">
+            Type: CNAME{"\n"}Host: {hostForCname}{"\n"}Target: {PLATFORM_HOSTNAME}{"\n"}TTL: 3600
+          </pre>
+          <p className="text-neutral-400">
+            For a root domain (e.g. <code>example.com</code>), use a provider that supports CNAME flattening / ALIAS / ANAME on <code>@</code> (Cloudflare, DNSimple, Route53).
+          </p>
+          <div className="rounded border border-amber-500/30 bg-amber-500/10 p-2 text-amber-200">
+            <strong>Also required on our side:</strong> add <code>{d || "the-domain"}</code> as a custom hostname in the Cloudflare Worker before it will serve traffic. DNS alone won't make it live.
+          </div>
+        </div>
+      )}
+
       <SaveRow onClick={() => save.mutate()} busy={save.isPending} />
     </Panel>
   );
 }
 
-function hostPart(d: string) {
-  const parts = d.split(".");
-  if (parts.length <= 2) return "@";
-  return parts.slice(0, parts.length - 2).join(".");
-}
 
 /* ─── Subscription ───────────────────────────────────── */
 
