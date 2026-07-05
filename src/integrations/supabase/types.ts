@@ -375,23 +375,67 @@ export type Database = {
           },
         ]
       }
+      tenant_price_changes: {
+        Row: {
+          changed_by: string | null
+          created_at: string
+          id: string
+          new_price: number
+          note: string | null
+          old_price: number
+          tenant_id: string
+        }
+        Insert: {
+          changed_by?: string | null
+          created_at?: string
+          id?: string
+          new_price: number
+          note?: string | null
+          old_price: number
+          tenant_id: string
+        }
+        Update: {
+          changed_by?: string | null
+          created_at?: string
+          id?: string
+          new_price?: number
+          note?: string | null
+          old_price?: number
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tenant_price_changes_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tenants: {
         Row: {
           address: string | null
+          billing_day: number
           created_at: string
           custom_domain: string | null
           email: string | null
           features: Json
           fee_cycle: string
           id: string
+          last_paid_date: string | null
           logo_url: string | null
+          monthly_price: number
           name: string
           niche: string
           phone: string | null
+          platform_notes: string | null
           primary_color: string
           secondary_color: string
+          setup_fee: number
           slug: string
           status: string
+          subscription_status: string
           tagline: string | null
           upi_id: string | null
           upi_qr_url: string | null
@@ -399,20 +443,26 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          billing_day?: number
           created_at?: string
           custom_domain?: string | null
           email?: string | null
           features?: Json
           fee_cycle?: string
           id?: string
+          last_paid_date?: string | null
           logo_url?: string | null
+          monthly_price?: number
           name: string
           niche?: string
           phone?: string | null
+          platform_notes?: string | null
           primary_color?: string
           secondary_color?: string
+          setup_fee?: number
           slug: string
           status?: string
+          subscription_status?: string
           tagline?: string | null
           upi_id?: string | null
           upi_qr_url?: string | null
@@ -420,20 +470,26 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          billing_day?: number
           created_at?: string
           custom_domain?: string | null
           email?: string | null
           features?: Json
           fee_cycle?: string
           id?: string
+          last_paid_date?: string | null
           logo_url?: string | null
+          monthly_price?: number
           name?: string
           niche?: string
           phone?: string | null
+          platform_notes?: string | null
           primary_color?: string
           secondary_color?: string
+          setup_fee?: number
           slug?: string
           status?: string
+          subscription_status?: string
           tagline?: string | null
           upi_id?: string | null
           upi_qr_url?: string | null
