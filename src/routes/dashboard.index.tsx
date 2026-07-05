@@ -5,7 +5,7 @@ import { fetchKpis, qk } from "@/lib/dashboard-queries";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Users, Inbox, IndianRupee, AlertCircle, Plus, ArrowRight } from "lucide-react";
-import { getNiche } from "@/lib/niche";
+import { niche } from "@/lib/niche";
 
 export const Route = createFileRoute("/dashboard/")({
   component: DashboardHome,
@@ -13,7 +13,7 @@ export const Route = createFileRoute("/dashboard/")({
 
 function DashboardHome() {
   const { tenant } = useDashboard();
-  const n = getNiche(tenant.niche);
+  const n = niche(tenant.niche);
   const { data, isLoading } = useQuery({
     queryKey: qk.kpis(tenant.id),
     queryFn: () => fetchKpis(tenant),
