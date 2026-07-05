@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as StarPlayersRouteImport } from './routes/star-players'
 import { Route as RegisterRouteImport } from './routes/register'
+import { Route as PlatformAdminRouteImport } from './routes/platform-admin'
 import { Route as FeesRouteImport } from './routes/fees'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ContactRouteImport } from './routes/contact'
@@ -35,6 +36,11 @@ const StarPlayersRoute = StarPlayersRouteImport.update({
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
   path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlatformAdminRoute = PlatformAdminRouteImport.update({
+  id: '/platform-admin',
+  path: '/platform-admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FeesRoute = FeesRouteImport.update({
@@ -120,6 +126,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/fees': typeof FeesRoute
+  '/platform-admin': typeof PlatformAdminRoute
   '/register': typeof RegisterRoute
   '/star-players': typeof StarPlayersRoute
   '/dashboard/batches': typeof DashboardBatchesRoute
@@ -138,6 +145,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
   '/fees': typeof FeesRoute
+  '/platform-admin': typeof PlatformAdminRoute
   '/register': typeof RegisterRoute
   '/star-players': typeof StarPlayersRoute
   '/dashboard/batches': typeof DashboardBatchesRoute
@@ -158,6 +166,7 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/fees': typeof FeesRoute
+  '/platform-admin': typeof PlatformAdminRoute
   '/register': typeof RegisterRoute
   '/star-players': typeof StarPlayersRoute
   '/dashboard/batches': typeof DashboardBatchesRoute
@@ -179,6 +188,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/dashboard'
     | '/fees'
+    | '/platform-admin'
     | '/register'
     | '/star-players'
     | '/dashboard/batches'
@@ -197,6 +207,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/contact'
     | '/fees'
+    | '/platform-admin'
     | '/register'
     | '/star-players'
     | '/dashboard/batches'
@@ -216,6 +227,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/dashboard'
     | '/fees'
+    | '/platform-admin'
     | '/register'
     | '/star-players'
     | '/dashboard/batches'
@@ -236,6 +248,7 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   DashboardRoute: typeof DashboardRouteWithChildren
   FeesRoute: typeof FeesRoute
+  PlatformAdminRoute: typeof PlatformAdminRoute
   RegisterRoute: typeof RegisterRoute
   StarPlayersRoute: typeof StarPlayersRoute
 }
@@ -254,6 +267,13 @@ declare module '@tanstack/react-router' {
       path: '/register'
       fullPath: '/register'
       preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/platform-admin': {
+      id: '/platform-admin'
+      path: '/platform-admin'
+      fullPath: '/platform-admin'
+      preLoaderRoute: typeof PlatformAdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/fees': {
@@ -408,6 +428,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   DashboardRoute: DashboardRouteWithChildren,
   FeesRoute: FeesRoute,
+  PlatformAdminRoute: PlatformAdminRoute,
   RegisterRoute: RegisterRoute,
   StarPlayersRoute: StarPlayersRoute,
 }
