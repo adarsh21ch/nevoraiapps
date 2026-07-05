@@ -3,6 +3,8 @@ import { useTenantState } from "@/lib/tenant-context";
 import { TenantPlaceholder } from "./TenantPlaceholder";
 import { SiteHeader } from "./SiteHeader";
 import { SiteFooter } from "./SiteFooter";
+import { FloatingWhatsApp } from "./FloatingWhatsApp";
+import { MobileCtaBar } from "./MobileCtaBar";
 
 /**
  * Wraps public site pages: shows a placeholder when no tenant is resolved,
