@@ -19,6 +19,11 @@ function Overview() {
   const mrr = activeTenants.reduce((s, t) => s + (t.monthly_price ?? 0), 0);
   const totalStudents = data.reduce((s, t) => s + (t.student_count ?? 0), 0);
   const dueCount = data.filter((t) => t.subscription_status !== "paid" && t.status === "active").length;
+  const receivedThisMonth = activeTenants
+    .filter((t) => t.subscription_status === "paid")
+    .reduce((s, t) => s + (t.monthly_price ?? 0), 0);
+  const expectedThisMonth = mrr;
+  const pct = expectedThisMonth > 0 ? Math.round((receivedThisMonth / expectedThisMonth) * 100) : 0;
 
   return (
     <div className="space-y-6">
@@ -33,11 +38,32 @@ function Overview() {
       </header>
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <Kpi icon={<TrendingUp className="size-4" />} label="MRR (active)" value={`₹${mrr.toLocaleString("en-IN")}`} sub={`${activeTenants.length} active tenants`} />
-        <Kpi icon={<Building2 className="size-4" />} label="Tenants" value={data.length} sub={`${data.filter((t) => t.status === "suspended").length} suspended`} />
+        <KpiLink to="/platform-admin/subscriptions" icon={<TrendingUp className="size-4" />} label="MRR (active)" value={`₹${mrr.toLocaleString("en-IN")}`} sub={`${activeTenants.length} active tenants`} />
+        <KpiLink to="/platform-admin/tenants" icon={<Building2 className="size-4" />} label="Tenants" value={data.length} sub={`${data.filter((t) => t.status === "suspended").length} suspended`} />
         <Kpi icon={<Users className="size-4" />} label="Students (all tenants)" value={totalStudents} />
-        <Kpi icon={<Wallet className="size-4" />} label="Subscriptions due / overdue" value={dueCount} sub="Chase these" />
+        <KpiLink to="/platform-admin/subscriptions" icon={<Wallet className="size-4" />} label="Subscriptions due / overdue" value={dueCount} sub="Chase these" />
       </div>
+
+      <Card className="p-4 bg-neutral-900 border-white/10 text-neutral-100">
+        <div className="flex items-baseline justify-between gap-3 flex-wrap">
+          <div>
+            <div className="text-xs uppercase tracking-widest text-neutral-400">This month</div>
+            <div className="mt-1 text-lg font-semibold">
+              <span className="text-emerald-300">₹{receivedThisMonth.toLocaleString("en-IN")}</span>
+              <span className="text-neutral-500 text-sm"> received of </span>
+              <span>₹{expectedThisMonth.toLocaleString("en-IN")}</span>
+              <span className="text-neutral-500 text-sm"> expected</span>
+            </div>
+          </div>
+          <Link to="/platform-admin/subscriptions" className="text-xs text-neutral-300 hover:text-white inline-flex items-center gap-1">
+            Manage <ChevronRight className="size-3" />
+          </Link>
+        </div>
+        <div className="mt-3 h-2 rounded-full bg-white/10 overflow-hidden">
+          <div className="h-full bg-gradient-to-r from-emerald-500 to-emerald-300" style={{ width: `${Math.min(100, pct)}%` }} />
+        </div>
+        <div className="mt-1 text-xs text-neutral-500">{pct}% collected</div>
+      </Card>
 
       <Card className="bg-neutral-900 border-white/10 text-neutral-100 overflow-hidden">
         <div className="p-4 border-b border-white/10 flex items-center justify-between">
