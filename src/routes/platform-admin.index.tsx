@@ -133,6 +133,21 @@ function Kpi({ icon, label, value, sub }: { icon: React.ReactNode; label: string
   );
 }
 
+function KpiLink({ to, icon, label, value, sub }: { to: string; icon: React.ReactNode; label: string; value: React.ReactNode; sub?: string }) {
+  return (
+    <Link to={to} className="block group">
+      <Card className="p-4 bg-neutral-900 border-white/10 text-neutral-100 group-hover:border-white/30 transition-colors">
+        <div className="flex items-center justify-between text-xs text-neutral-400">
+          <span className="flex items-center gap-2">{icon}{label}</span>
+          <ChevronRight className="size-3 group-hover:translate-x-0.5 transition-transform" />
+        </div>
+        <div className="mt-2 text-2xl font-bold">{value}</div>
+        {sub && <div className="mt-1 text-xs text-neutral-500">{sub}</div>}
+      </Card>
+    </Link>
+  );
+}
+
 export function StatusChip({ status }: { status: string }) {
   const map: Record<string, string> = {
     active: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30",
