@@ -14,6 +14,17 @@ export function TenantPlaceholder() {
         <p className="mt-8 text-xs uppercase tracking-widest text-neutral-500">
           No academy is configured for this URL yet.
         </p>
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+          <a
+            href="/auth"
+            className="inline-flex items-center justify-center rounded-lg bg-white px-5 py-2.5 text-sm font-semibold text-neutral-900 transition hover:bg-neutral-200"
+          >
+            Log in
+          </a>
+        </div>
+        <p className="mt-6 text-xs text-neutral-500">
+          Academy owners and platform admins sign in here — you'll be taken to your dashboard.
+        </p>
       </div>
     </div>
   );

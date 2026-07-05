@@ -81,11 +81,16 @@ export function SiteFooter() {
           <div>
             © {new Date().getFullYear()} {tenant.name}. All rights reserved.
           </div>
-          {features.powered_by_badge !== false ? (
-            <div>
-              Powered by <span className="font-semibold text-foreground">Academy OS</span>
-            </div>
-          ) : null}
+          <div className="flex items-center gap-4">
+            <a href="/auth" className="hover:text-foreground underline-offset-2 hover:underline">
+              Owner login
+            </a>
+            {features.powered_by_badge !== false ? (
+              <div>
+                Powered by <span className="font-semibold text-foreground">Academy OS</span>
+              </div>
+            ) : null}
+          </div>
         </div>
       </div>
     </footer>
