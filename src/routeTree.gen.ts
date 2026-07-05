@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as StarPlayersRouteImport } from './routes/star-players'
+import { Route as RegisterRouteImport } from './routes/register'
 import { Route as FeesRouteImport } from './routes/fees'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AboutRouteImport } from './routes/about'
@@ -18,6 +19,11 @@ import { Route as IndexRouteImport } from './routes/index'
 const StarPlayersRoute = StarPlayersRouteImport.update({
   id: '/star-players',
   path: '/star-players',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RegisterRoute = RegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FeesRoute = FeesRouteImport.update({
@@ -46,6 +52,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
   '/fees': typeof FeesRoute
+  '/register': typeof RegisterRoute
   '/star-players': typeof StarPlayersRoute
 }
 export interface FileRoutesByTo {
@@ -53,6 +60,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
   '/fees': typeof FeesRoute
+  '/register': typeof RegisterRoute
   '/star-players': typeof StarPlayersRoute
 }
 export interface FileRoutesById {
@@ -61,14 +69,28 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
   '/fees': typeof FeesRoute
+  '/register': typeof RegisterRoute
   '/star-players': typeof StarPlayersRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/contact' | '/fees' | '/star-players'
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/contact'
+    | '/fees'
+    | '/register'
+    | '/star-players'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/contact' | '/fees' | '/star-players'
-  id: '__root__' | '/' | '/about' | '/contact' | '/fees' | '/star-players'
+  to: '/' | '/about' | '/contact' | '/fees' | '/register' | '/star-players'
+  id:
+    | '__root__'
+    | '/'
+    | '/about'
+    | '/contact'
+    | '/fees'
+    | '/register'
+    | '/star-players'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -76,6 +98,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   ContactRoute: typeof ContactRoute
   FeesRoute: typeof FeesRoute
+  RegisterRoute: typeof RegisterRoute
   StarPlayersRoute: typeof StarPlayersRoute
 }
 
@@ -86,6 +109,13 @@ declare module '@tanstack/react-router' {
       path: '/star-players'
       fullPath: '/star-players'
       preLoaderRoute: typeof StarPlayersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/fees': {
@@ -124,8 +154,19 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   ContactRoute: ContactRoute,
   FeesRoute: FeesRoute,
+  RegisterRoute: RegisterRoute,
   StarPlayersRoute: StarPlayersRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
