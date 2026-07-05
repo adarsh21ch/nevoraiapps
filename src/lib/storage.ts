@@ -10,7 +10,9 @@ const COMPRESS_MIN_BYTES = 300 * 1024;
  * Coaches upload 5–10 MB phone photos; the site only ever needs ~200 KB.
  * Falls back to the original file for SVG/GIF, small files, or any codec failure.
  */
-async function maybeCompressImage(file: File): Promise<{ blob: Blob; ext: string; contentType: string }> {
+async function maybeCompressImage(
+  file: File,
+): Promise<{ blob: Blob; ext: string; contentType: string }> {
   const original = {
     blob: file as Blob,
     ext: file.name.split(".").pop() ?? "bin",
@@ -36,7 +38,9 @@ async function maybeCompressImage(file: File): Promise<{ blob: Blob; ext: string
     if (!ctx) return original;
     ctx.drawImage(bitmap, 0, 0, width, height);
     bitmap.close();
-    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/webp", 0.82));
+    const blob = await new Promise<Blob | null>((resolve) =>
+      canvas.toBlob(resolve, "image/webp", 0.82),
+    );
     if (blob && blob.size > 0 && blob.size < file.size) {
       return { blob, ext: "webp", contentType: "image/webp" };
     }

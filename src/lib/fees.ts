@@ -83,7 +83,9 @@ export function reminderMessage(opts: {
   amount: number;
   period: string;
 }): string {
-  const greeting = opts.guardianName?.trim() ? `Namaste ${opts.guardianName.trim()} ji` : "Namaste ji";
+  const greeting = opts.guardianName?.trim()
+    ? `Namaste ${opts.guardianName.trim()} ji`
+    : "Namaste ji";
   return (
     `${greeting}, ${opts.studentName} ki ${periodLabel(opts.period)} fees ` +
     `₹${opts.amount.toLocaleString("en-IN")} pending hai. Kripya jald payment kar dein. ` +

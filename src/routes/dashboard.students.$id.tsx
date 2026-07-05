@@ -7,10 +7,23 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Phone, MessageCircle, Edit, Plus, ArrowLeft, Download } from "lucide-react";
 import { toast } from "sonner";
 import { StudentDialog } from "./dashboard.students";
@@ -25,7 +38,10 @@ function StudentDetail() {
   const { tenant } = useDashboard();
   const qc = useQueryClient();
   const student = useQuery({ queryKey: qk.student(id), queryFn: () => fetchStudent(id) });
-  const payments = useQuery({ queryKey: qk.studentPayments(id), queryFn: () => fetchStudentPayments(id) });
+  const payments = useQuery({
+    queryKey: qk.studentPayments(id),
+    queryFn: () => fetchStudentPayments(id),
+  });
 
   const [editOpen, setEditOpen] = useState(false);
   const [payOpen, setPayOpen] = useState(false);
@@ -39,7 +55,10 @@ function StudentDetail() {
 
   return (
     <div className="space-y-4">
-      <Link to="/dashboard/students" className="text-sm text-muted-foreground inline-flex items-center gap-1 hover:text-foreground">
+      <Link
+        to="/dashboard/students"
+        className="text-sm text-muted-foreground inline-flex items-center gap-1 hover:text-foreground"
+      >
         <ArrowLeft className="size-4" /> All students
       </Link>
 
@@ -48,20 +67,32 @@ function StudentDetail() {
           <div>
             <div className="flex items-center gap-2 flex-wrap">
               <h1 className="text-2xl font-bold">{s.name}</h1>
-              <Badge variant="secondary" className="capitalize">{s.status}</Badge>
+              <Badge variant="secondary" className="capitalize">
+                {s.status}
+              </Badge>
             </div>
-            <div className="text-sm text-muted-foreground mt-1">Joined {new Date(s.joined_at).toLocaleDateString("en-IN")}</div>
+            <div className="text-sm text-muted-foreground mt-1">
+              Joined {new Date(s.joined_at).toLocaleDateString("en-IN")}
+            </div>
           </div>
           <Dialog open={editOpen} onOpenChange={setEditOpen}>
             <DialogTrigger asChild>
-              <Button variant="outline" size="sm"><Edit className="size-4 mr-1" /> Edit</Button>
+              <Button variant="outline" size="sm">
+                <Edit className="size-4 mr-1" /> Edit
+              </Button>
             </DialogTrigger>
             <StudentDialog
               onClose={() => setEditOpen(false)}
               initial={{
-                id: s.id, name: s.name, phone: s.phone,
-                guardian_name: s.guardian_name, guardian_phone: s.guardian_phone,
-                dob: s.dob, batch_id: s.batch_id, fee_plan_id: s.fee_plan_id, status: s.status,
+                id: s.id,
+                name: s.name,
+                phone: s.phone,
+                guardian_name: s.guardian_name,
+                guardian_phone: s.guardian_phone,
+                dob: s.dob,
+                batch_id: s.batch_id,
+                fee_plan_id: s.fee_plan_id,
+                status: s.status,
               }}
             />
           </Dialog>
@@ -73,12 +104,21 @@ function StudentDetail() {
           <Info label="Guardian phone" value={s.guardian_phone || "—"} />
           <Info label="DOB" value={s.dob ? new Date(s.dob).toLocaleDateString("en-IN") : "—"} />
           <Info label="Batch" value={(s as any).batches?.name || "—"} />
-          <Info label="Fee plan" value={(s as any).fee_plans?.name ? `${(s as any).fee_plans.name} · ₹${(s as any).fee_plans.amount}` : "—"} />
+          <Info
+            label="Fee plan"
+            value={
+              (s as any).fee_plans?.name
+                ? `${(s as any).fee_plans.name} · ₹${(s as any).fee_plans.amount}`
+                : "—"
+            }
+          />
         </div>
 
         <div className="flex flex-wrap gap-2 mt-4">
           <Button asChild size="sm" variant="outline">
-            <a href={`tel:${s.phone}`}><Phone className="size-4 mr-1" /> Call</a>
+            <a href={`tel:${s.phone}`}>
+              <Phone className="size-4 mr-1" /> Call
+            </a>
           </Button>
           <Button asChild size="sm" style={{ backgroundColor: "#25D366", color: "white" }}>
             <a href={`https://wa.me/${waPhone}`} target="_blank" rel="noreferrer">
@@ -87,7 +127,9 @@ function StudentDetail() {
           </Button>
           {s.guardian_phone && (
             <Button asChild size="sm" variant="outline">
-              <a href={`tel:${s.guardian_phone}`}><Phone className="size-4 mr-1" /> Call guardian</a>
+              <a href={`tel:${s.guardian_phone}`}>
+                <Phone className="size-4 mr-1" /> Call guardian
+              </a>
             </Button>
           )}
         </div>
@@ -97,7 +139,9 @@ function StudentDetail() {
         <div className="flex items-center justify-between mb-3">
           <div>
             <h2 className="font-semibold">Payments</h2>
-            <div className="text-xs text-muted-foreground">Total paid: ₹{totalPaid.toLocaleString("en-IN")}</div>
+            <div className="text-xs text-muted-foreground">
+              Total paid: ₹{totalPaid.toLocaleString("en-IN")}
+            </div>
           </div>
           <Dialog open={payOpen} onOpenChange={setPayOpen}>
             <DialogTrigger asChild>
@@ -105,11 +149,15 @@ function StudentDetail() {
                 <Plus className="size-4 mr-1" /> Record payment
               </Button>
             </DialogTrigger>
-            <RecordPaymentDialog studentId={id} tenantId={tenant.id} onClose={() => {
-              setPayOpen(false);
-              qc.invalidateQueries({ queryKey: qk.studentPayments(id) });
-              qc.invalidateQueries({ queryKey: qk.kpis(tenant.id) });
-            }} />
+            <RecordPaymentDialog
+              studentId={id}
+              tenantId={tenant.id}
+              onClose={() => {
+                setPayOpen(false);
+                qc.invalidateQueries({ queryKey: qk.studentPayments(id) });
+                qc.invalidateQueries({ queryKey: qk.kpis(tenant.id) });
+              }}
+            />
           </Dialog>
         </div>
 
@@ -117,7 +165,13 @@ function StudentDetail() {
           {(payments.data ?? []).map((p) => (
             <div key={p.id} className="py-3 flex items-center justify-between text-sm">
               <div>
-                <div className="font-medium">₹{Number(p.amount).toLocaleString("en-IN")} <span className="text-xs text-muted-foreground">· {p.type}{p.period ? ` (${p.period})` : ""}</span></div>
+                <div className="font-medium">
+                  ₹{Number(p.amount).toLocaleString("en-IN")}{" "}
+                  <span className="text-xs text-muted-foreground">
+                    · {p.type}
+                    {p.period ? ` (${p.period})` : ""}
+                  </span>
+                </div>
                 <div className="text-xs text-muted-foreground">
                   {new Date(p.created_at).toLocaleString("en-IN")} · {p.method}
                   {p.note ? ` · ${p.note}` : ""}
@@ -165,13 +219,24 @@ function Info({ label, value }: { label: string; value: string }) {
 }
 
 function RecordPaymentDialog({
-  studentId, tenantId, onClose,
-}: { studentId: string; tenantId: string; onClose: () => void }) {
-  const feePlans = useQuery({ queryKey: qk.feePlans(tenantId), queryFn: () => fetchFeePlans(tenantId) });
+  studentId,
+  tenantId,
+  onClose,
+}: {
+  studentId: string;
+  tenantId: string;
+  onClose: () => void;
+}) {
+  const feePlans = useQuery({
+    queryKey: qk.feePlans(tenantId),
+    queryFn: () => fetchFeePlans(tenantId),
+  });
   const now = new Date();
   const [amount, setAmount] = useState<string>("");
   const [type, setType] = useState("monthly");
-  const [period, setPeriod] = useState(`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`);
+  const [period, setPeriod] = useState(
+    `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`,
+  );
   const [method, setMethod] = useState("upi");
   const [note, setNote] = useState("");
 
@@ -197,28 +262,55 @@ function RecordPaymentDialog({
 
   return (
     <DialogContent className="max-w-sm">
-      <DialogHeader><DialogTitle>Record payment</DialogTitle></DialogHeader>
-      <form className="space-y-3" onSubmit={(e) => { e.preventDefault(); save.mutate(); }}>
+      <DialogHeader>
+        <DialogTitle>Record payment</DialogTitle>
+      </DialogHeader>
+      <form
+        className="space-y-3"
+        onSubmit={(e) => {
+          e.preventDefault();
+          save.mutate();
+        }}
+      >
         <div className="space-y-1.5">
           <Label>Fee plan (shortcut)</Label>
-          <Select onValueChange={(v) => {
-            const p = (feePlans.data ?? []).find((x) => x.id === v);
-            if (p) { setAmount(String(p.amount)); setType(p.type); }
-          }}>
-            <SelectTrigger><SelectValue placeholder="Copy from a fee plan" /></SelectTrigger>
+          <Select
+            onValueChange={(v) => {
+              const p = (feePlans.data ?? []).find((x) => x.id === v);
+              if (p) {
+                setAmount(String(p.amount));
+                setType(p.type);
+              }
+            }}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Copy from a fee plan" />
+            </SelectTrigger>
             <SelectContent>
               {(feePlans.data ?? []).map((p) => (
-                <SelectItem key={p.id} value={p.id}>{p.name} · ₹{p.amount} ({p.type})</SelectItem>
+                <SelectItem key={p.id} value={p.id}>
+                  {p.name} · ₹{p.amount} ({p.type})
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
         </div>
         <div className="grid grid-cols-2 gap-2">
-          <div className="space-y-1.5"><Label>Amount ₹</Label><Input required type="number" value={amount} onChange={(e) => setAmount(e.target.value)} /></div>
+          <div className="space-y-1.5">
+            <Label>Amount ₹</Label>
+            <Input
+              required
+              type="number"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+            />
+          </div>
           <div className="space-y-1.5">
             <Label>Type</Label>
             <Select value={type} onValueChange={setType}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="monthly">Monthly</SelectItem>
                 <SelectItem value="registration">Registration</SelectItem>
@@ -236,7 +328,9 @@ function RecordPaymentDialog({
         <div className="space-y-1.5">
           <Label>Method</Label>
           <Select value={method} onValueChange={setMethod}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="upi">UPI</SelectItem>
               <SelectItem value="cash">Cash</SelectItem>
@@ -245,10 +339,17 @@ function RecordPaymentDialog({
             </SelectContent>
           </Select>
         </div>
-        <div className="space-y-1.5"><Label>Note</Label><Input value={note} onChange={(e) => setNote(e.target.value)} /></div>
+        <div className="space-y-1.5">
+          <Label>Note</Label>
+          <Input value={note} onChange={(e) => setNote(e.target.value)} />
+        </div>
         <DialogFooter>
-          <Button type="button" variant="ghost" onClick={onClose}>Cancel</Button>
-          <Button type="submit" disabled={save.isPending}>Save</Button>
+          <Button type="button" variant="ghost" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button type="submit" disabled={save.isPending}>
+            Save
+          </Button>
         </DialogFooter>
       </form>
     </DialogContent>

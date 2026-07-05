@@ -17,15 +17,30 @@ function DashboardHome() {
   });
 
   const kpis = [
-    { label: "Active students", value: data?.activeStudents ?? 0, icon: Users, tone: "text-emerald-600" },
-    { label: "New registrations (7d)", value: data?.newRegsThisWeek ?? 0, icon: Inbox, tone: "text-blue-600" },
+    {
+      label: "Active students",
+      value: data?.activeStudents ?? 0,
+      icon: Users,
+      tone: "text-emerald-600",
+    },
+    {
+      label: "New registrations (7d)",
+      value: data?.newRegsThisWeek ?? 0,
+      icon: Inbox,
+      tone: "text-blue-600",
+    },
     {
       label: "This month's collection",
       value: `₹${(data?.collectionThisMonth ?? 0).toLocaleString("en-IN")}`,
       icon: IndianRupee,
       tone: "text-amber-600",
     },
-    { label: "Pending monthly fees", value: data?.pendingFeeCount ?? 0, icon: AlertCircle, tone: "text-rose-600" },
+    {
+      label: "Pending monthly fees",
+      value: data?.pendingFeeCount ?? 0,
+      icon: AlertCircle,
+      tone: "text-rose-600",
+    },
   ];
 
   return (
@@ -55,9 +70,13 @@ function DashboardHome() {
       <Card className="p-5">
         <h2 className="font-semibold mb-1">Getting started</h2>
         <ul className="text-sm text-muted-foreground list-disc pl-5 space-y-1">
-          <li>Check the <strong>Registrations</strong> inbox for new sign-ups.</li>
+          <li>
+            Check the <strong>Registrations</strong> inbox for new sign-ups.
+          </li>
           <li>Manage students, batches and fee plans from the sidebar.</li>
-          <li>Update your public website in <strong>Site editor</strong>.</li>
+          <li>
+            Update your public website in <strong>Site editor</strong>.
+          </li>
         </ul>
       </Card>
     </div>

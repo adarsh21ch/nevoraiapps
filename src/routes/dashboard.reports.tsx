@@ -61,7 +61,9 @@ function Reports() {
         csvSafe(p.note ?? ""),
       ].join(","),
     );
-    const blob = new Blob([[header.join(","), ...lines].join("\n")], { type: "text/csv;charset=utf-8" });
+    const blob = new Blob([[header.join(","), ...lines].join("\n")], {
+      type: "text/csv;charset=utf-8",
+    });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -75,7 +77,9 @@ function Reports() {
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Collections</h1>
-          <p className="text-sm text-muted-foreground">Last {MONTHS_BACK} months · total ₹{grandTotal.toLocaleString("en-IN")}</p>
+          <p className="text-sm text-muted-foreground">
+            Last {MONTHS_BACK} months · total ₹{grandTotal.toLocaleString("en-IN")}
+          </p>
         </div>
         <Button variant="outline" size="sm" onClick={exportCsv} disabled={payments.length === 0}>
           <Download className="size-4 mr-1" /> Export CSV
@@ -89,8 +93,15 @@ function Reports() {
             <BarChart data={byMonth} margin={{ top: 4, right: 4, bottom: 0, left: -16 }}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} />
               <XAxis dataKey="month" tickLine={false} axisLine={false} fontSize={12} />
-              <YAxis tickLine={false} axisLine={false} fontSize={12} tickFormatter={(v: number) => (v >= 1000 ? `${Math.round(v / 1000)}k` : String(v))} />
-              <Tooltip formatter={(v: number) => [`₹${Number(v).toLocaleString("en-IN")}`, "Collected"]} />
+              <YAxis
+                tickLine={false}
+                axisLine={false}
+                fontSize={12}
+                tickFormatter={(v: number) => (v >= 1000 ? `${Math.round(v / 1000)}k` : String(v))}
+              />
+              <Tooltip
+                formatter={(v: number) => [`₹${Number(v).toLocaleString("en-IN")}`, "Collected"]}
+              />
               <Bar dataKey="total" fill="var(--brand, #1d4ed8)" radius={[6, 6, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
@@ -105,12 +116,20 @@ function Reports() {
   );
 }
 
-function BreakdownCard({ title, rows }: { title: string; rows: { label: string; total: number }[] }) {
+function BreakdownCard({
+  title,
+  rows,
+}: {
+  title: string;
+  rows: { label: string; total: number }[];
+}) {
   return (
     <Card className="p-4 md:p-5">
       <h2 className="text-sm font-semibold mb-2">{title}</h2>
       <div className="divide-y">
-        {rows.length === 0 && <div className="py-3 text-sm text-muted-foreground">No payments yet.</div>}
+        {rows.length === 0 && (
+          <div className="py-3 text-sm text-muted-foreground">No payments yet.</div>
+        )}
         {rows.map((r) => (
           <div key={r.label} className="py-2 flex items-center justify-between text-sm">
             <span className="text-muted-foreground">{r.label}</span>

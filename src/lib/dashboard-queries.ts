@@ -111,11 +111,32 @@ export async function fetchKpis(tenant: Tenant): Promise<Kpis> {
   const periods = cycle === "joining_date" ? candidatePeriods(now) : [periodKey(now)];
 
   const [active, regs, pays, studentsMonthly, paidRows] = await Promise.all([
-    supabase.from("students").select("id", { count: "exact", head: true }).eq("tenant_id", tenantId).eq("status", "active"),
-    supabase.from("registrations").select("id", { count: "exact", head: true }).eq("tenant_id", tenantId).gte("created_at", weekAgo),
-    supabase.from("payments").select("amount").eq("tenant_id", tenantId).gte("created_at", startOfMonth),
-    supabase.from("students").select("id, joined_at, fee_plan_id, fee_plans!inner(type)").eq("tenant_id", tenantId).eq("status", "active").eq("fee_plans.type", "monthly"),
-    supabase.from("payments").select("student_id, period").eq("tenant_id", tenantId).in("period", periods),
+    supabase
+      .from("students")
+      .select("id", { count: "exact", head: true })
+      .eq("tenant_id", tenantId)
+      .eq("status", "active"),
+    supabase
+      .from("registrations")
+      .select("id", { count: "exact", head: true })
+      .eq("tenant_id", tenantId)
+      .gte("created_at", weekAgo),
+    supabase
+      .from("payments")
+      .select("amount")
+      .eq("tenant_id", tenantId)
+      .gte("created_at", startOfMonth),
+    supabase
+      .from("students")
+      .select("id, joined_at, fee_plan_id, fee_plans!inner(type)")
+      .eq("tenant_id", tenantId)
+      .eq("status", "active")
+      .eq("fee_plans.type", "monthly"),
+    supabase
+      .from("payments")
+      .select("student_id, period")
+      .eq("tenant_id", tenantId)
+      .in("period", periods),
   ]);
 
   const collection = (pays.data ?? []).reduce((s, p) => s + Number(p.amount || 0), 0);

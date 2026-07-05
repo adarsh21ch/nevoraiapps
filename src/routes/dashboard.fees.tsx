@@ -4,11 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { useDashboard } from "@/lib/dashboard-context";
-import {
-  fetchPaymentsForPeriods,
-  fetchStudents,
-  qk,
-} from "@/lib/dashboard-queries";
+import { fetchPaymentsForPeriods, fetchStudents, qk } from "@/lib/dashboard-queries";
 import {
   candidatePeriods,
   periodKey,
@@ -113,7 +109,9 @@ function FeeRegister() {
           today,
         });
         const paidPayment =
-          due.state === "paid" ? paymentByStudentPeriod.get(`${s.id}:${due.period}`) ?? null : null;
+          due.state === "paid"
+            ? (paymentByStudentPeriod.get(`${s.id}:${due.period}`) ?? null)
+            : null;
         return {
           studentId: s.id,
           name: s.name,
@@ -168,10 +166,17 @@ function FeeRegister() {
         </div>
         {cycle === "calendar_month" && (
           <div className="flex items-center gap-1">
-            <Button variant="outline" size="icon" aria-label="Previous month" onClick={() => setMonthOffset((m) => m - 1)}>
+            <Button
+              variant="outline"
+              size="icon"
+              aria-label="Previous month"
+              onClick={() => setMonthOffset((m) => m - 1)}
+            >
               <ChevronLeft className="size-4" />
             </Button>
-            <div className="text-sm font-medium w-36 text-center">{format(selectedMonth, "MMMM yyyy")}</div>
+            <div className="text-sm font-medium w-36 text-center">
+              {format(selectedMonth, "MMMM yyyy")}
+            </div>
             <Button
               variant="outline"
               size="icon"
@@ -212,7 +217,9 @@ function FeeRegister() {
       </Tabs>
 
       <Card className="divide-y p-0 overflow-hidden">
-        {loading && <div className="p-6 text-sm text-muted-foreground text-center">Loading register…</div>}
+        {loading && (
+          <div className="p-6 text-sm text-muted-foreground text-center">Loading register…</div>
+        )}
         {!loading && visible.length === 0 && (
           <div className="p-6 text-sm text-muted-foreground text-center">
             {rows.length === 0
@@ -300,7 +307,8 @@ function FeeRow({
         )}
         {due.state === "paid" && row.paidPayment && (
           <div className="text-xs mt-0.5 text-muted-foreground">
-            Paid {format(new Date(row.paidPayment.created_at), "d MMM")} · {row.paidPayment.method.toUpperCase()} · #{row.paidPayment.receipt_no}
+            Paid {format(new Date(row.paidPayment.created_at), "d MMM")} ·{" "}
+            {row.paidPayment.method.toUpperCase()} · #{row.paidPayment.receipt_no}
           </div>
         )}
       </div>
@@ -337,7 +345,11 @@ function FeeRow({
                 </a>
               </Button>
             )}
-            <Button size="sm" onClick={onCollect} style={{ backgroundColor: "var(--brand)", color: "white" }}>
+            <Button
+              size="sm"
+              onClick={onCollect}
+              style={{ backgroundColor: "var(--brand)", color: "white" }}
+            >
               Collect
             </Button>
           </>
@@ -413,7 +425,11 @@ function CollectDialog({
         </div>
         <div className="space-y-1.5">
           <Label>Note (optional)</Label>
-          <Input value={note} onChange={(e) => setNote(e.target.value)} placeholder="e.g. paid half, rest next week" />
+          <Input
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            placeholder="e.g. paid half, rest next week"
+          />
         </div>
         <div className="grid grid-cols-2 gap-3">
           <Button

@@ -60,8 +60,20 @@ export function generateReceiptPdf(tenant: Tenant, r: ReceiptData) {
   };
 
   row("Received from", r.studentName);
-  row("Date", new Date(r.paidAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }));
-  row("Towards", r.period ? `${prettyType(r.type)} fees · ${periodLabel(r.period)}` : `${prettyType(r.type)} fees`);
+  row(
+    "Date",
+    new Date(r.paidAt).toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    }),
+  );
+  row(
+    "Towards",
+    r.period
+      ? `${prettyType(r.type)} fees · ${periodLabel(r.period)}`
+      : `${prettyType(r.type)} fees`,
+  );
   row("Payment mode", r.method.toUpperCase());
 
   y += 6;
