@@ -67,30 +67,30 @@ function RegisterContent() {
       return;
     }
     setSaving(true);
-    const { data, error } = await supabase
-      .from("registrations")
-      .insert({
-        tenant_id: tenant.id,
-        name: form.name.trim(),
-        dob: form.dob || null,
-        guardian_name: form.guardian_name.trim() || null,
-        guardian_phone: form.guardian_phone.trim() || null,
-        phone: form.phone.trim(),
-        whatsapp: form.whatsapp.trim() || null,
-        batch_id: form.batch_id || null,
-        fee_plan_id: form.fee_plan_id,
-        status: "new",
-        payment_status: "pending",
-      })
-      .select("id")
-      .maybeSingle();
+    // Generate the id client-side: anon visitors have INSERT-only access to
+    // registrations (no SELECT), so we can't read the row back after insert.
+    const newId = crypto.randomUUID();
+    const { error } = await supabase.from("registrations").insert({
+      id: newId,
+      tenant_id: tenant.id,
+      name: form.name.trim(),
+      dob: form.dob || null,
+      guardian_name: form.guardian_name.trim() || null,
+      guardian_phone: form.guardian_phone.trim() || null,
+      phone: form.phone.trim(),
+      whatsapp: form.whatsapp.trim() || null,
+      batch_id: form.batch_id || null,
+      fee_plan_id: form.fee_plan_id,
+      status: "new",
+      payment_status: "pending",
+    });
     setSaving(false);
-    if (error || !data) {
+    if (error) {
       toast.error("Could not submit. Please try again.");
       console.error(error);
       return;
     }
-    setRegId(data.id);
+    setRegId(newId);
     setStep("payment");
   }
 
@@ -102,22 +102,42 @@ function RegisterContent() {
     }
     if (!regId) return;
     setSaving(true);
-    const { error } = await supabase.from("registrations").insert({
-      tenant_id: tenant.id,
-      name: form.name.trim(),
-      phone: form.phone.trim(),
-      whatsapp: form.whatsapp.trim() || null,
-      guardian_name: form.guardian_name.trim() || null,
-      guardian_phone: form.guardian_phone.trim() || null,
-      dob: form.dob || null,
-      batch_id: form.batch_id || null,
-      fee_plan_id: form.fee_plan_id,
-      status: "new",
-      payment_status: "claimed_paid",
-      payment_ref: paymentRef.trim(),
+    // Update the existing registration (created in step 1) with the payment
+    // reference via a SECURITY DEFINER function — anon has no UPDATE grant on
+    // the table, and inserting again would duplicate the row for the owner.
+    const { data, error } = await supabase.rpc("claim_registration_payment", {
+      p_registration_id: regId,
+      p_payment_ref: paymentRef.trim(),
     });
+    if (error && (error.code === "PGRST202" || /function/i.test(error.message))) {
+      // Function not deployed yet — fall back to a second insert so the
+      // prospect is never blocked. Owner may see a duplicate row until the
+      // claim_registration_payment migration is applied.
+      const { error: insErr } = await supabase.from("registrations").insert({
+        tenant_id: tenant.id,
+        name: form.name.trim(),
+        phone: form.phone.trim(),
+        whatsapp: form.whatsapp.trim() || null,
+        guardian_name: form.guardian_name.trim() || null,
+        guardian_phone: form.guardian_phone.trim() || null,
+        dob: form.dob || null,
+        batch_id: form.batch_id || null,
+        fee_plan_id: form.fee_plan_id,
+        status: "new",
+        payment_status: "claimed_paid",
+        payment_ref: paymentRef.trim(),
+      });
+      setSaving(false);
+      if (insErr) {
+        toast.error("Could not save payment reference.");
+        console.error(insErr);
+        return;
+      }
+      setStep("done");
+      return;
+    }
     setSaving(false);
-    if (error) {
+    if (error || !data) {
       toast.error("Could not save payment reference.");
       console.error(error);
       return;
