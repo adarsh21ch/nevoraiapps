@@ -50,42 +50,6 @@ function HomeContent() {
         }}
       >
         <div className="absolute inset-0 opacity-20 [background-image:radial-gradient(white_1px,transparent_1px)] [background-size:24px_24px]" />
-        {tenant.niche === "academy" ? (
-          <div
-            aria-hidden="true"
-            className="cricket-ball-float pointer-events-none absolute -right-8 top-8 hidden opacity-90 sm:block md:-right-4 md:top-14"
-          >
-            <svg
-              width="120"
-              height="120"
-              viewBox="0 0 100 100"
-              className="cricket-ball-spin drop-shadow-2xl"
-            >
-              <circle cx="50" cy="50" r="46" fill="#b91c1c" stroke="#7f1d1d" strokeWidth="1.5" />
-              <circle cx="50" cy="50" r="46" fill="url(#ball-shine)" />
-              <path
-                d="M 50 4 A 46 46 0 0 1 50 96"
-                fill="none"
-                stroke="white"
-                strokeWidth="2"
-                strokeDasharray="3 3"
-              />
-              <path
-                d="M 50 4 A 46 46 0 0 0 50 96"
-                fill="none"
-                stroke="white"
-                strokeWidth="2"
-                strokeDasharray="3 3"
-              />
-              <defs>
-                <radialGradient id="ball-shine" cx="35%" cy="30%" r="60%">
-                  <stop offset="0%" stopColor="white" stopOpacity="0.35" />
-                  <stop offset="100%" stopColor="white" stopOpacity="0" />
-                </radialGradient>
-              </defs>
-            </svg>
-          </div>
-        ) : null}
         <div className="relative mx-auto max-w-6xl px-4 py-20 sm:px-6 md:py-28 lg:py-32">
           <div className="max-w-3xl">
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-medium uppercase tracking-wider text-white/90 backdrop-blur">
