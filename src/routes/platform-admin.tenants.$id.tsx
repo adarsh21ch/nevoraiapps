@@ -9,13 +9,20 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { fetchPriceLog, fetchTenantById, pqk } from "@/lib/platform-queries";
 import { StatusChip, SubChip } from "./platform-admin.index";
 import { niche, nicheOptions, type NicheKey } from "@/lib/niche";
 import { getFeatures, type Tenant, type TenantFeatures } from "@/lib/tenant";
 import { ArrowLeft, ExternalLink, Globe, Info, Pause, Play, ShieldAlert } from "lucide-react";
 import { uploadTenantFile, signedUrl } from "@/lib/storage";
+import { SiteContentEditor } from "@/components/site-editor/SiteContentEditor";
 
 export const Route = createFileRoute("/platform-admin/tenants/$id")({
   component: TenantDetail,
@@ -24,17 +31,35 @@ export const Route = createFileRoute("/platform-admin/tenants/$id")({
 type FeatureKey = keyof TenantFeatures;
 const FEATURE_LIST: { key: FeatureKey; label: string; help: string }[] = [
   { key: "online_registration", label: "Online registration", help: "Public /register form." },
-  { key: "fee_tracking", label: "Fee tracking", help: "Fee register, payment recording, monthly collection KPI." },
-  { key: "whatsapp_reminders", label: "WhatsApp reminders", help: "Enable the WhatsApp reminders module (add-on)." },
+  {
+    key: "fee_tracking",
+    label: "Fee tracking",
+    help: "Fee register, payment recording, monthly collection KPI.",
+  },
+  {
+    key: "whatsapp_reminders",
+    label: "WhatsApp reminders",
+    help: "Enable the WhatsApp reminders module (add-on).",
+  },
   { key: "attendance", label: "Attendance", help: "Roll-call and attendance history." },
-  { key: "powered_by_badge", label: "Powered-by badge", help: "Show 'Powered by Academy OS' on the public site footer." },
+  {
+    key: "powered_by_badge",
+    label: "Powered-by badge",
+    help: "Show 'Powered by Academy OS' on the public site footer.",
+  },
 ];
 
 function TenantDetail() {
   const { id } = Route.useParams();
   const qc = useQueryClient();
-  const { data: tenant, isLoading } = useQuery({ queryKey: pqk.tenant(id), queryFn: () => fetchTenantById(id) });
-  const { data: priceLog = [] } = useQuery({ queryKey: pqk.priceLog(id), queryFn: () => fetchPriceLog(id) });
+  const { data: tenant, isLoading } = useQuery({
+    queryKey: pqk.tenant(id),
+    queryFn: () => fetchTenantById(id),
+  });
+  const { data: priceLog = [] } = useQuery({
+    queryKey: pqk.priceLog(id),
+    queryFn: () => fetchPriceLog(id),
+  });
 
   if (isLoading || !tenant) {
     return <div className="text-sm text-neutral-400">Loading tenant…</div>;
@@ -43,13 +68,23 @@ function TenantDetail() {
   return (
     <div className="space-y-6">
       <div>
-        <Link to="/platform-admin" className="text-xs text-neutral-400 hover:text-white inline-flex items-center gap-1">
+        <Link
+          to="/platform-admin"
+          className="text-xs text-neutral-400 hover:text-white inline-flex items-center gap-1"
+        >
           <ArrowLeft className="size-3" /> All tenants
         </Link>
         <div className="mt-2 flex flex-wrap items-center gap-3">
-          <div className="size-10 rounded-md" style={{ background: `linear-gradient(135deg, ${tenant.primary_color}, ${tenant.secondary_color})` }} />
+          <div
+            className="size-10 rounded-md"
+            style={{
+              background: `linear-gradient(135deg, ${tenant.primary_color}, ${tenant.secondary_color})`,
+            }}
+          />
           <div className="min-w-0">
-            <h1 className="text-2xl md:text-3xl font-bold tracking-tight truncate">{tenant.name}</h1>
+            <h1 className="text-2xl md:text-3xl font-bold tracking-tight truncate">
+              {tenant.name}
+            </h1>
             <div className="text-xs text-neutral-400">
               /{tenant.slug} · {niche(tenant.niche).label}
             </div>
@@ -57,7 +92,12 @@ function TenantDetail() {
           <div className="ml-auto flex flex-wrap gap-2 items-center">
             <StatusChip status={tenant.status} />
             <SubChip sub={tenant.subscription_status} />
-            <a href={`/?tenant=${tenant.slug}`} target="_blank" rel="noreferrer" className="text-xs text-neutral-300 hover:text-white inline-flex items-center gap-1">
+            <a
+              href={`/?tenant=${tenant.slug}`}
+              target="_blank"
+              rel="noreferrer"
+              className="text-xs text-neutral-300 hover:text-white inline-flex items-center gap-1"
+            >
               View site <ExternalLink className="size-3" />
             </a>
           </div>
@@ -66,10 +106,22 @@ function TenantDetail() {
 
       <div className="grid gap-4 lg:grid-cols-3">
         <div className="lg:col-span-2 space-y-4">
-          <BasicsEditor tenant={tenant} onSaved={() => qc.invalidateQueries({ queryKey: pqk.tenant(id) })} />
-          <BrandingEditor tenant={tenant} onSaved={() => qc.invalidateQueries({ queryKey: pqk.tenant(id) })} />
-          <FeaturesEditor tenant={tenant} onSaved={() => qc.invalidateQueries({ queryKey: pqk.tenant(id) })} />
-          <DomainEditor tenant={tenant} onSaved={() => qc.invalidateQueries({ queryKey: pqk.tenant(id) })} />
+          <BasicsEditor
+            tenant={tenant}
+            onSaved={() => qc.invalidateQueries({ queryKey: pqk.tenant(id) })}
+          />
+          <BrandingEditor
+            tenant={tenant}
+            onSaved={() => qc.invalidateQueries({ queryKey: pqk.tenant(id) })}
+          />
+          <FeaturesEditor
+            tenant={tenant}
+            onSaved={() => qc.invalidateQueries({ queryKey: pqk.tenant(id) })}
+          />
+          <DomainEditor
+            tenant={tenant}
+            onSaved={() => qc.invalidateQueries({ queryKey: pqk.tenant(id) })}
+          />
         </div>
         <div className="space-y-4">
           <SubscriptionCard
@@ -81,8 +133,26 @@ function TenantDetail() {
               qc.invalidateQueries({ queryKey: pqk.tenants });
             }}
           />
-          <SuspendCard tenant={tenant} onSaved={() => { qc.invalidateQueries({ queryKey: pqk.tenant(id) }); qc.invalidateQueries({ queryKey: pqk.tenants }); }} />
+          <SuspendCard
+            tenant={tenant}
+            onSaved={() => {
+              qc.invalidateQueries({ queryKey: pqk.tenant(id) });
+              qc.invalidateQueries({ queryKey: pqk.tenants });
+            }}
+          />
         </div>
+      </div>
+
+      <div className="space-y-2">
+        <div className="flex items-center gap-2">
+          <Globe className="size-4 text-neutral-400" />
+          <h2 className="text-lg font-semibold">Website content</h2>
+        </div>
+        <p className="text-xs text-neutral-400">
+          What visitors see on the public site. Managed by the platform team — owners don't edit
+          this.
+        </p>
+        <SiteContentEditor tenantId={tenant.id} />
       </div>
     </div>
   );
@@ -107,7 +177,10 @@ function BasicsEditor({ tenant, onSaved }: { tenant: Tenant; onSaved: () => void
       const { error } = await supabase.from("tenants").update(f).eq("id", tenant.id);
       if (error) throw error;
     },
-    onSuccess: () => { toast.success("Saved"); onSaved(); },
+    onSuccess: () => {
+      toast.success("Saved");
+      onSaved();
+    },
     onError: (e: Error) => toast.error(e.message),
   });
   return (
@@ -117,15 +190,25 @@ function BasicsEditor({ tenant, onSaved }: { tenant: Tenant; onSaved: () => void
         <div className="space-y-1.5">
           <Label className="text-neutral-300">Niche</Label>
           <Select value={f.niche} onValueChange={(v) => setF({ ...f, niche: v as NicheKey })}>
-            <SelectTrigger className="bg-neutral-950 border-white/10 text-white"><SelectValue /></SelectTrigger>
-            <SelectContent>{nicheOptions.map((n) => <SelectItem key={n.value} value={n.value}>{n.label}</SelectItem>)}</SelectContent>
+            <SelectTrigger className="bg-neutral-950 border-white/10 text-white">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {nicheOptions.map((n) => (
+                <SelectItem key={n.value} value={n.value}>
+                  {n.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
           </Select>
         </div>
         <PField label="Tagline" value={f.tagline} onChange={(v) => setF({ ...f, tagline: v })} />
         <div className="space-y-1.5">
           <Label className="text-neutral-300">Fee cycle</Label>
           <Select value={f.fee_cycle} onValueChange={(v) => setF({ ...f, fee_cycle: v })}>
-            <SelectTrigger className="bg-neutral-950 border-white/10 text-white"><SelectValue /></SelectTrigger>
+            <SelectTrigger className="bg-neutral-950 border-white/10 text-white">
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="calendar_month">Calendar month</SelectItem>
               <SelectItem value="joining_date">Joining-date anniversary</SelectItem>
@@ -139,7 +222,12 @@ function BasicsEditor({ tenant, onSaved }: { tenant: Tenant; onSaved: () => void
       </div>
       <div className="space-y-1.5">
         <Label className="text-neutral-300">Address</Label>
-        <Textarea rows={2} value={f.address} onChange={(e) => setF({ ...f, address: e.target.value })} className="bg-neutral-950 border-white/10 text-white" />
+        <Textarea
+          rows={2}
+          value={f.address}
+          onChange={(e) => setF({ ...f, address: e.target.value })}
+          className="bg-neutral-950 border-white/10 text-white"
+        />
       </div>
       <SaveRow onClick={() => save.mutate()} busy={save.isPending} />
     </Panel>
@@ -157,15 +245,23 @@ function BrandingEditor({ tenant, onSaved }: { tenant: Tenant; onSaved: () => vo
   });
   const [logoPreview, setLogoPreview] = useState("");
   const [qrPreview, setQrPreview] = useState("");
-  useEffect(() => { if (f.logo_url) signedUrl(f.logo_url).then(setLogoPreview); else setLogoPreview(""); }, [f.logo_url]);
-  useEffect(() => { if (f.upi_qr_url) signedUrl(f.upi_qr_url).then(setQrPreview); else setQrPreview(""); }, [f.upi_qr_url]);
+  useEffect(() => {
+    if (f.logo_url) signedUrl(f.logo_url).then(setLogoPreview);
+    else setLogoPreview("");
+  }, [f.logo_url]);
+  useEffect(() => {
+    if (f.upi_qr_url) signedUrl(f.upi_qr_url).then(setQrPreview);
+    else setQrPreview("");
+  }, [f.upi_qr_url]);
 
   async function upload(field: "logo_url" | "upi_qr_url", file: File) {
     try {
       const path = await uploadTenantFile(tenant.id, field, file);
       setF({ ...f, [field]: path });
       toast.success("Uploaded — remember to Save");
-    } catch (e: any) { toast.error(e.message); }
+    } catch (e: any) {
+      toast.error(e.message);
+    }
   }
 
   const save = useMutation({
@@ -173,7 +269,10 @@ function BrandingEditor({ tenant, onSaved }: { tenant: Tenant; onSaved: () => vo
       const { error } = await supabase.from("tenants").update(f).eq("id", tenant.id);
       if (error) throw error;
     },
-    onSuccess: () => { toast.success("Saved"); onSaved(); },
+    onSuccess: () => {
+      toast.success("Saved");
+      onSaved();
+    },
     onError: (e: Error) => toast.error(e.message),
   });
 
@@ -183,34 +282,74 @@ function BrandingEditor({ tenant, onSaved }: { tenant: Tenant; onSaved: () => vo
         <div className="space-y-1.5">
           <Label className="text-neutral-300">Primary colour</Label>
           <div className="flex gap-2 items-center">
-            <input type="color" value={f.primary_color} onChange={(e) => setF({ ...f, primary_color: e.target.value })} className="w-12 h-9 rounded" />
-            <Input value={f.primary_color} onChange={(e) => setF({ ...f, primary_color: e.target.value })} className="bg-neutral-950 border-white/10 text-white" />
+            <input
+              type="color"
+              value={f.primary_color}
+              onChange={(e) => setF({ ...f, primary_color: e.target.value })}
+              className="w-12 h-9 rounded"
+            />
+            <Input
+              value={f.primary_color}
+              onChange={(e) => setF({ ...f, primary_color: e.target.value })}
+              className="bg-neutral-950 border-white/10 text-white"
+            />
           </div>
         </div>
         <div className="space-y-1.5">
           <Label className="text-neutral-300">Secondary colour</Label>
           <div className="flex gap-2 items-center">
-            <input type="color" value={f.secondary_color} onChange={(e) => setF({ ...f, secondary_color: e.target.value })} className="w-12 h-9 rounded" />
-            <Input value={f.secondary_color} onChange={(e) => setF({ ...f, secondary_color: e.target.value })} className="bg-neutral-950 border-white/10 text-white" />
+            <input
+              type="color"
+              value={f.secondary_color}
+              onChange={(e) => setF({ ...f, secondary_color: e.target.value })}
+              className="w-12 h-9 rounded"
+            />
+            <Input
+              value={f.secondary_color}
+              onChange={(e) => setF({ ...f, secondary_color: e.target.value })}
+              className="bg-neutral-950 border-white/10 text-white"
+            />
           </div>
         </div>
         <div className="space-y-1.5">
           <Label className="text-neutral-300">Logo</Label>
           <div className="flex items-center gap-3">
-            {logoPreview && <img src={logoPreview} alt="" className="size-14 rounded-md object-cover border border-white/10" />}
+            {logoPreview && (
+              <img
+                src={logoPreview}
+                alt=""
+                className="size-14 rounded-md object-cover border border-white/10"
+              />
+            )}
             <label className="text-xs cursor-pointer inline-flex items-center gap-1 px-3 py-2 rounded-md border border-white/10 hover:bg-white/5">
               Upload logo
-              <input type="file" accept="image/*" className="hidden" onChange={(e) => e.target.files?.[0] && upload("logo_url", e.target.files[0])} />
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => e.target.files?.[0] && upload("logo_url", e.target.files[0])}
+              />
             </label>
           </div>
         </div>
         <div className="space-y-1.5">
           <Label className="text-neutral-300">UPI QR</Label>
           <div className="flex items-center gap-3">
-            {qrPreview && <img src={qrPreview} alt="" className="size-14 rounded-md object-cover border border-white/10" />}
+            {qrPreview && (
+              <img
+                src={qrPreview}
+                alt=""
+                className="size-14 rounded-md object-cover border border-white/10"
+              />
+            )}
             <label className="text-xs cursor-pointer inline-flex items-center gap-1 px-3 py-2 rounded-md border border-white/10 hover:bg-white/5">
               Upload QR
-              <input type="file" accept="image/*" className="hidden" onChange={(e) => e.target.files?.[0] && upload("upi_qr_url", e.target.files[0])} />
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => e.target.files?.[0] && upload("upi_qr_url", e.target.files[0])}
+              />
             </label>
           </div>
         </div>
@@ -226,17 +365,26 @@ function FeaturesEditor({ tenant, onSaved }: { tenant: Tenant; onSaved: () => vo
   const [feats, setFeats] = useState<TenantFeatures>(getFeatures(tenant));
   const save = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.from("tenants").update({ features: feats }).eq("id", tenant.id);
+      const { error } = await supabase
+        .from("tenants")
+        .update({ features: feats })
+        .eq("id", tenant.id);
       if (error) throw error;
     },
-    onSuccess: () => { toast.success("Features updated"); onSaved(); },
+    onSuccess: () => {
+      toast.success("Features updated");
+      onSaved();
+    },
     onError: (e: Error) => toast.error(e.message),
   });
   return (
     <Panel title="Features">
       <div className="space-y-2">
         {FEATURE_LIST.map((f) => (
-          <label key={f.key} className="flex items-start justify-between gap-3 rounded-md border border-white/10 p-3">
+          <label
+            key={f.key}
+            className="flex items-start justify-between gap-3 rounded-md border border-white/10 p-3"
+          >
             <div className="min-w-0">
               <div className="text-sm font-medium">{f.label}</div>
               <div className="text-xs text-neutral-400">{f.help}</div>
@@ -263,19 +411,36 @@ function DomainEditor({ tenant, onSaved }: { tenant: Tenant; onSaved: () => void
   const save = useMutation({
     mutationFn: async () => {
       const value = domain.trim().toLowerCase() || null;
-      const { error } = await supabase.from("tenants").update({ custom_domain: value }).eq("id", tenant.id);
+      const { error } = await supabase
+        .from("tenants")
+        .update({ custom_domain: value })
+        .eq("id", tenant.id);
       if (error) throw error;
     },
-    onSuccess: () => { toast.success("Domain saved"); onSaved(); },
+    onSuccess: () => {
+      toast.success("Domain saved");
+      onSaved();
+    },
     onError: (e: Error) => toast.error(e.message),
   });
 
   const d = domain.trim().toLowerCase();
-  const isWildcardCovered = d.endsWith(PLATFORM_WILDCARD_SUFFIX) && d !== PLATFORM_WILDCARD_SUFFIX.slice(1);
-  const hostForCname = d ? (d.split(".").length <= 2 ? "@" : d.split(".").slice(0, -2).join(".")) : "app";
+  const isWildcardCovered =
+    d.endsWith(PLATFORM_WILDCARD_SUFFIX) && d !== PLATFORM_WILDCARD_SUFFIX.slice(1);
+  const hostForCname = d
+    ? d.split(".").length <= 2
+      ? "@"
+      : d.split(".").slice(0, -2).join(".")
+    : "app";
 
   return (
-    <Panel title={<span className="flex items-center gap-2"><Globe className="size-4" /> Custom domain</span>}>
+    <Panel
+      title={
+        <span className="flex items-center gap-2">
+          <Globe className="size-4" /> Custom domain
+        </span>
+      }
+    >
       <PField label="Domain (e.g. app.kirklandcricket.in)" value={domain} onChange={setDomain} />
 
       {isWildcardCovered ? (
@@ -284,7 +449,9 @@ function DomainEditor({ tenant, onSaved }: { tenant: Tenant; onSaved: () => void
             <Info className="size-3" /> No DNS setup needed
           </div>
           <p>
-            <strong>{d}</strong> is already covered by the platform's <code className="bg-black/30 px-1 rounded">*{PLATFORM_WILDCARD_SUFFIX}</code> wildcard. Just save — it goes live immediately.
+            <strong>{d}</strong> is already covered by the platform's{" "}
+            <code className="bg-black/30 px-1 rounded">*{PLATFORM_WILDCARD_SUFFIX}</code> wildcard.
+            Just save — it goes live immediately.
           </p>
         </div>
       ) : (
@@ -292,15 +459,22 @@ function DomainEditor({ tenant, onSaved }: { tenant: Tenant; onSaved: () => void
           <div className="font-semibold text-white flex items-center gap-1">
             <Info className="size-3" /> DNS instructions to send the client
           </div>
-          <p>At their DNS provider, add this <strong>CNAME record</strong>:</p>
+          <p>
+            At their DNS provider, add this <strong>CNAME record</strong>:
+          </p>
           <pre className="bg-neutral-900 rounded p-2 overflow-x-auto text-[11px]">
-            Type: CNAME{"\n"}Host: {hostForCname}{"\n"}Target: {PLATFORM_HOSTNAME}{"\n"}TTL: 3600
+            Type: CNAME{"\n"}Host: {hostForCname}
+            {"\n"}Target: {PLATFORM_HOSTNAME}
+            {"\n"}TTL: 3600
           </pre>
           <p className="text-neutral-400">
-            For a root domain (e.g. <code>example.com</code>), use a provider that supports CNAME flattening / ALIAS / ANAME on <code>@</code> (Cloudflare, DNSimple, Route53).
+            For a root domain (e.g. <code>example.com</code>), use a provider that supports CNAME
+            flattening / ALIAS / ANAME on <code>@</code> (Cloudflare, DNSimple, Route53).
           </p>
           <div className="rounded border border-amber-500/30 bg-amber-500/10 p-2 text-amber-200">
-            <strong>Also required on our side:</strong> add <code>{d || "the-domain"}</code> as a custom hostname in the Cloudflare Worker before it will serve traffic. DNS alone won't make it live.
+            <strong>Also required on our side:</strong> add <code>{d || "the-domain"}</code> as a
+            custom hostname in the Cloudflare Worker before it will serve traffic. DNS alone won't
+            make it live.
           </div>
         </div>
       )}
@@ -310,12 +484,17 @@ function DomainEditor({ tenant, onSaved }: { tenant: Tenant; onSaved: () => void
   );
 }
 
-
 /* ─── Subscription ───────────────────────────────────── */
 
 function SubscriptionCard({
-  tenant, priceLog, onSaved,
-}: { tenant: Tenant; priceLog: any[]; onSaved: () => void }) {
+  tenant,
+  priceLog,
+  onSaved,
+}: {
+  tenant: Tenant;
+  priceLog: any[];
+  onSaved: () => void;
+}) {
   const [f, setF] = useState({
     monthly_price: String(tenant.monthly_price ?? 0),
     setup_fee: String(tenant.setup_fee ?? 0),
@@ -354,7 +533,10 @@ function SubscriptionCard({
         setPriceNote("");
       }
     },
-    onSuccess: () => { toast.success("Subscription updated"); onSaved(); },
+    onSuccess: () => {
+      toast.success("Subscription updated");
+      onSaved();
+    },
     onError: (e: Error) => toast.error(e.message),
   });
 
@@ -368,20 +550,40 @@ function SubscriptionCard({
       if (error) throw error;
       setF({ ...f, subscription_status: "paid", last_paid_date: today });
     },
-    onSuccess: () => { toast.success("Marked paid"); onSaved(); },
+    onSuccess: () => {
+      toast.success("Marked paid");
+      onSaved();
+    },
     onError: (e: Error) => toast.error(e.message),
   });
 
   return (
     <Panel title="Your subscription">
       <div className="grid grid-cols-2 gap-3">
-        <PField label="Monthly ₹" value={f.monthly_price} onChange={(v) => setF({ ...f, monthly_price: v.replace(/[^\d]/g, "") })} />
-        <PField label="Setup ₹" value={f.setup_fee} onChange={(v) => setF({ ...f, setup_fee: v.replace(/[^\d]/g, "") })} />
-        <PField label="Billing day" value={f.billing_day} onChange={(v) => setF({ ...f, billing_day: v.replace(/[^\d]/g, "") })} />
+        <PField
+          label="Monthly ₹"
+          value={f.monthly_price}
+          onChange={(v) => setF({ ...f, monthly_price: v.replace(/[^\d]/g, "") })}
+        />
+        <PField
+          label="Setup ₹"
+          value={f.setup_fee}
+          onChange={(v) => setF({ ...f, setup_fee: v.replace(/[^\d]/g, "") })}
+        />
+        <PField
+          label="Billing day"
+          value={f.billing_day}
+          onChange={(v) => setF({ ...f, billing_day: v.replace(/[^\d]/g, "") })}
+        />
         <div className="space-y-1.5">
           <Label className="text-neutral-300">Status</Label>
-          <Select value={f.subscription_status} onValueChange={(v) => setF({ ...f, subscription_status: v })}>
-            <SelectTrigger className="bg-neutral-950 border-white/10 text-white"><SelectValue /></SelectTrigger>
+          <Select
+            value={f.subscription_status}
+            onValueChange={(v) => setF({ ...f, subscription_status: v })}
+          >
+            <SelectTrigger className="bg-neutral-950 border-white/10 text-white">
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="paid">Paid</SelectItem>
               <SelectItem value="due">Due</SelectItem>
@@ -391,37 +593,71 @@ function SubscriptionCard({
         </div>
         <div className="col-span-2 space-y-1.5">
           <Label className="text-neutral-300">Last paid date</Label>
-          <Input type="date" value={f.last_paid_date ?? ""} onChange={(e) => setF({ ...f, last_paid_date: e.target.value })} className="bg-neutral-950 border-white/10 text-white" />
+          <Input
+            type="date"
+            value={f.last_paid_date ?? ""}
+            onChange={(e) => setF({ ...f, last_paid_date: e.target.value })}
+            className="bg-neutral-950 border-white/10 text-white"
+          />
         </div>
       </div>
 
       <div className="space-y-1.5">
         <Label className="text-neutral-300">Price-change note (optional)</Label>
-        <Input placeholder="Why is the price changing?" value={priceNote} onChange={(e) => setPriceNote(e.target.value)} className="bg-neutral-950 border-white/10 text-white" />
+        <Input
+          placeholder="Why is the price changing?"
+          value={priceNote}
+          onChange={(e) => setPriceNote(e.target.value)}
+          className="bg-neutral-950 border-white/10 text-white"
+        />
       </div>
 
       <div className="space-y-1.5">
         <Label className="text-neutral-300">Notes</Label>
-        <Textarea rows={2} value={f.platform_notes} onChange={(e) => setF({ ...f, platform_notes: e.target.value })} className="bg-neutral-950 border-white/10 text-white" />
+        <Textarea
+          rows={2}
+          value={f.platform_notes}
+          onChange={(e) => setF({ ...f, platform_notes: e.target.value })}
+          className="bg-neutral-950 border-white/10 text-white"
+        />
       </div>
 
       <div className="flex flex-wrap gap-2">
-        <Button size="sm" className="bg-white text-neutral-900 hover:bg-neutral-100" onClick={() => save.mutate()} disabled={save.isPending}>Save</Button>
-        <Button size="sm" variant="ghost" className="text-emerald-300 hover:text-emerald-200 hover:bg-white/5" onClick={() => markPaid.mutate()} disabled={markPaid.isPending}>
+        <Button
+          size="sm"
+          className="bg-white text-neutral-900 hover:bg-neutral-100"
+          onClick={() => save.mutate()}
+          disabled={save.isPending}
+        >
+          Save
+        </Button>
+        <Button
+          size="sm"
+          variant="ghost"
+          className="text-emerald-300 hover:text-emerald-200 hover:bg-white/5"
+          onClick={() => markPaid.mutate()}
+          disabled={markPaid.isPending}
+        >
           Mark this month paid
         </Button>
       </div>
 
       <div className="rounded-md border border-white/10 bg-neutral-950 p-3">
-        <div className="text-xs uppercase tracking-widest text-neutral-400 mb-2">Price change history</div>
+        <div className="text-xs uppercase tracking-widest text-neutral-400 mb-2">
+          Price change history
+        </div>
         {priceLog.length === 0 ? (
           <div className="text-xs text-neutral-500">No price changes yet.</div>
         ) : (
           <ul className="space-y-1.5">
             {priceLog.map((p) => (
               <li key={p.id} className="text-xs flex items-baseline gap-2">
-                <span className="text-neutral-500 w-24 shrink-0">{new Date(p.created_at).toLocaleDateString("en-IN")}</span>
-                <span>₹{p.old_price} → <strong>₹{p.new_price}</strong></span>
+                <span className="text-neutral-500 w-24 shrink-0">
+                  {new Date(p.created_at).toLocaleDateString("en-IN")}
+                </span>
+                <span>
+                  ₹{p.old_price} → <strong>₹{p.new_price}</strong>
+                </span>
                 {p.note && <span className="text-neutral-400">· {p.note}</span>}
               </li>
             ))}
@@ -438,25 +674,49 @@ function SuspendCard({ tenant, onSaved }: { tenant: Tenant; onSaved: () => void 
   const suspended = tenant.status === "suspended";
   const toggle = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.from("tenants").update({ status: suspended ? "active" : "suspended" }).eq("id", tenant.id);
+      const { error } = await supabase
+        .from("tenants")
+        .update({ status: suspended ? "active" : "suspended" })
+        .eq("id", tenant.id);
       if (error) throw error;
     },
-    onSuccess: () => { toast.success(suspended ? "Reactivated" : "Suspended"); onSaved(); },
+    onSuccess: () => {
+      toast.success(suspended ? "Reactivated" : "Suspended");
+      onSaved();
+    },
     onError: (e: Error) => toast.error(e.message),
   });
   return (
-    <Panel title={<span className="flex items-center gap-2"><ShieldAlert className="size-4" /> Access control</span>}>
+    <Panel
+      title={
+        <span className="flex items-center gap-2">
+          <ShieldAlert className="size-4" /> Access control
+        </span>
+      }
+    >
       <p className="text-xs text-neutral-400">
         {suspended
           ? "This tenant is currently SUSPENDED. Their public site shows a 'temporarily unavailable' page."
           : "Suspending stops the public site immediately. Data is preserved and can be reactivated any time."}
       </p>
       <Button
-        className={suspended ? "bg-emerald-500 text-white hover:bg-emerald-400 w-full" : "bg-rose-500 text-white hover:bg-rose-400 w-full"}
+        className={
+          suspended
+            ? "bg-emerald-500 text-white hover:bg-emerald-400 w-full"
+            : "bg-rose-500 text-white hover:bg-rose-400 w-full"
+        }
         onClick={() => toggle.mutate()}
         disabled={toggle.isPending}
       >
-        {suspended ? (<><Play className="size-4 mr-1" /> Reactivate tenant</>) : (<><Pause className="size-4 mr-1" /> Suspend tenant</>)}
+        {suspended ? (
+          <>
+            <Play className="size-4 mr-1" /> Reactivate tenant
+          </>
+        ) : (
+          <>
+            <Pause className="size-4 mr-1" /> Suspend tenant
+          </>
+        )}
       </Button>
     </Panel>
   );
@@ -473,11 +733,23 @@ function Panel({ title, children }: { title: React.ReactNode; children: React.Re
   );
 }
 
-function PField({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
+function PField({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+}) {
   return (
     <div className="space-y-1.5">
       <Label className="text-neutral-300">{label}</Label>
-      <Input value={value} onChange={(e) => onChange(e.target.value)} className="bg-neutral-950 border-white/10 text-white" />
+      <Input
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="bg-neutral-950 border-white/10 text-white"
+      />
     </div>
   );
 }
@@ -485,7 +757,12 @@ function PField({ label, value, onChange }: { label: string; value: string; onCh
 function SaveRow({ onClick, busy }: { onClick: () => void; busy: boolean }) {
   return (
     <div className="flex justify-end pt-2">
-      <Button size="sm" className="bg-white text-neutral-900 hover:bg-neutral-100" onClick={onClick} disabled={busy}>
+      <Button
+        size="sm"
+        className="bg-white text-neutral-900 hover:bg-neutral-100"
+        onClick={onClick}
+        disabled={busy}
+      >
         {busy ? "Saving…" : "Save"}
       </Button>
     </div>

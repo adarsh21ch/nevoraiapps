@@ -11,7 +11,6 @@ import {
   Users,
   CalendarDays,
   Wallet,
-  Globe,
   LogOut,
   Menu,
   ExternalLink,
@@ -35,7 +34,6 @@ const nav: (NavItem & { requiresFeature?: "fee_tracking" })[] = [
   { to: "/dashboard/reports", label: "Reports", icon: BarChart3, requiresFeature: "fee_tracking" },
   { to: "/dashboard/batches", label: "Batches", icon: CalendarDays },
   { to: "/dashboard/fee-plans", label: "Fee plans", icon: Wallet },
-  { to: "/dashboard/site", label: "Site editor", icon: Globe },
 ];
 
 export function DashboardShell({ children }: { children: ReactNode }) {
@@ -194,7 +192,6 @@ function MoreLinks() {
         { to: "/dashboard/batches", label: "Batches", icon: CalendarDays },
         { to: "/dashboard/fee-plans", label: "Fee plans", icon: Wallet },
         { to: "/dashboard/reports", label: "Reports", icon: BarChart3 },
-        { to: "/dashboard/site", label: "Site editor", icon: Globe },
       ].map((l) => {
         const Icon = l.icon;
         return (

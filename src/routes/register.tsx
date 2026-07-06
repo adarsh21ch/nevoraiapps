@@ -11,7 +11,9 @@ import { generateBlankRegistrationPdf } from "@/lib/registration-pdf";
 import { upiQrDataUrl } from "@/lib/upi";
 
 export const Route = createFileRoute("/register")({
-  head: () => ({ meta: [{ title: "Register" }, { name: "description", content: "Register online" }] }),
+  head: () => ({
+    meta: [{ title: "Register" }, { name: "description", content: "Register online" }],
+  }),
   component: () => (
     <TenantGate>
       <RegisterContent />
@@ -44,7 +46,8 @@ function RegisterContent() {
 
   const selectedFee = fees.find((f) => f.id === form.fee_plan_id);
   const regFee = fees.find((f) => f.type === "registration");
-  const amount = (selectedFee?.amount ?? 0) + (regFee && regFee.id !== selectedFee?.id ? regFee.amount : 0);
+  const amount =
+    (selectedFee?.amount ?? 0) + (regFee && regFee.id !== selectedFee?.id ? regFee.amount : 0);
 
   // Generate QR when we hit the payment step
   const [qrDataUrl, setQrDataUrl] = useState<string>("");
@@ -54,11 +57,30 @@ function RegisterContent() {
     if (!tenant.upi_id) return;
     let active = true;
     upiQrDataUrl(
-      { upiId: tenant.upi_id, name: tenant.name, amount, note: `Registration - ${form.name}`.slice(0, 40) },
+      {
+        upiId: tenant.upi_id,
+        name: tenant.name,
+        amount,
+        note: `Registration - ${form.name}`.slice(0, 40),
+      },
       tenant.primary_color,
-    ).then((u) => { if (active) setQrDataUrl(u); }).catch(() => {});
-    return () => { active = false; };
-  }, [step, tenant.upi_id, tenant.upi_qr_url, tenant.name, tenant.primary_color, amount, form.name]);
+    )
+      .then((u) => {
+        if (active) setQrDataUrl(u);
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, [
+    step,
+    tenant.upi_id,
+    tenant.upi_qr_url,
+    tenant.name,
+    tenant.primary_color,
+    amount,
+    form.name,
+  ]);
 
   async function submitForm(e: React.FormEvent) {
     e.preventDefault();
@@ -166,7 +188,10 @@ function RegisterContent() {
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-12 sm:px-6 sm:py-20">
-      <div className="text-xs font-semibold uppercase tracking-widest" style={{ color: "var(--brand)" }}>
+      <div
+        className="text-xs font-semibold uppercase tracking-widest"
+        style={{ color: "var(--brand)" }}
+      >
         Join {tenant.name}
       </div>
       <div className="mt-3 flex items-start justify-between gap-4">
@@ -190,22 +215,54 @@ function RegisterContent() {
       </div>
 
       {step === "form" ? (
-        <form onSubmit={submitForm} className="mt-10 space-y-5 animate-in fade-in slide-in-from-bottom-2 duration-300">
-          <Field label="Student name *" value={form.name} onChange={(v) => setForm({ ...form, name: v })} />
-          <Field label="Date of birth" type="date" value={form.dob} onChange={(v) => setForm({ ...form, dob: v })} />
-          <Field label="Guardian name" value={form.guardian_name} onChange={(v) => setForm({ ...form, guardian_name: v })} />
-          <Field label="Guardian phone" value={form.guardian_phone} onChange={(v) => setForm({ ...form, guardian_phone: v })} />
-          <Field label="Contact phone *" value={form.phone} onChange={(v) => setForm({ ...form, phone: v })} />
-          <Field label="WhatsApp number" value={form.whatsapp} onChange={(v) => setForm({ ...form, whatsapp: v })} />
+        <form
+          onSubmit={submitForm}
+          className="mt-10 space-y-5 animate-in fade-in slide-in-from-bottom-2 duration-300"
+        >
+          <Field
+            label="Student name *"
+            value={form.name}
+            onChange={(v) => setForm({ ...form, name: v })}
+          />
+          <Field
+            label="Date of birth"
+            type="date"
+            value={form.dob}
+            onChange={(v) => setForm({ ...form, dob: v })}
+          />
+          <Field
+            label="Guardian name"
+            value={form.guardian_name}
+            onChange={(v) => setForm({ ...form, guardian_name: v })}
+          />
+          <Field
+            label="Guardian phone"
+            value={form.guardian_phone}
+            onChange={(v) => setForm({ ...form, guardian_phone: v })}
+          />
+          <Field
+            label="Contact phone *"
+            value={form.phone}
+            onChange={(v) => setForm({ ...form, phone: v })}
+          />
+          <Field
+            label="WhatsApp number"
+            value={form.whatsapp}
+            onChange={(v) => setForm({ ...form, whatsapp: v })}
+          />
 
           {batches.length > 0 ? (
             <SelectField
               label="Batch"
               value={form.batch_id}
               onChange={(v) => setForm({ ...form, batch_id: v })}
-              options={[{ value: "", label: "Select a batch" }, ...batches.map((b) => ({
-                value: b.id, label: b.timing ? `${b.name} — ${b.timing}` : b.name,
-              }))]}
+              options={[
+                { value: "", label: "Select a batch" },
+                ...batches.map((b) => ({
+                  value: b.id,
+                  label: b.timing ? `${b.name} — ${b.timing}` : b.name,
+                })),
+              ]}
             />
           ) : null}
 
@@ -213,10 +270,13 @@ function RegisterContent() {
             label="Fee plan *"
             value={form.fee_plan_id}
             onChange={(v) => setForm({ ...form, fee_plan_id: v })}
-            options={[{ value: "", label: "Select a plan" }, ...fees.map((f) => ({
-              value: f.id,
-              label: `${f.name} — ₹${f.amount.toLocaleString("en-IN")}${f.type === "monthly" ? "/mo" : ""}`,
-            }))]}
+            options={[
+              { value: "", label: "Select a plan" },
+              ...fees.map((f) => ({
+                value: f.id,
+                label: `${f.name} — ₹${f.amount.toLocaleString("en-IN")}${f.type === "monthly" ? "/mo" : ""}`,
+              })),
+            ]}
           />
 
           <button
@@ -234,7 +294,9 @@ function RegisterContent() {
       {step === "payment" ? (
         <div className="mt-10 space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
           <div className="rounded-2xl border border-border/60 bg-card p-6 shadow-sm">
-            <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Amount to pay</div>
+            <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Amount to pay
+            </div>
             <div className="mt-1 text-4xl font-bold text-foreground">
               ₹{amount.toLocaleString("en-IN")}
             </div>
@@ -260,7 +322,9 @@ function RegisterContent() {
                 )}
               </div>
               <div className="flex-1 text-sm">
-                <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">UPI ID</div>
+                <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  UPI ID
+                </div>
                 <div className="mt-1 flex items-center gap-2">
                   <span className="select-all break-all font-mono text-base font-semibold text-foreground">
                     {tenant.upi_id ?? "—"}
@@ -276,8 +340,8 @@ function RegisterContent() {
                   ) : null}
                 </div>
                 <p className="mt-3 text-xs text-muted-foreground">
-                  Scan with any UPI app (GPay, PhonePe, Paytm). Amount is pre-filled.
-                  After payment, copy the transaction reference below.
+                  Scan with any UPI app (GPay, PhonePe, Paytm). Amount is pre-filled. After payment,
+                  copy the transaction reference below.
                 </p>
               </div>
             </div>
@@ -296,8 +360,7 @@ function RegisterContent() {
               className="inline-flex w-full items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold text-white disabled:opacity-60"
               style={{ backgroundColor: "var(--brand)" }}
             >
-              {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-              I have paid — submit
+              {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : null}I have paid — submit
             </button>
           </form>
         </div>
@@ -305,13 +368,16 @@ function RegisterContent() {
 
       {step === "done" ? (
         <div className="mt-10 rounded-2xl border border-border/60 bg-card p-8 text-center shadow-sm animate-in fade-in zoom-in-95 duration-300">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full" style={{ backgroundColor: "var(--brand)" }}>
+          <div
+            className="mx-auto flex h-16 w-16 items-center justify-center rounded-full"
+            style={{ backgroundColor: "var(--brand)" }}
+          >
             <CheckCircle2 className="h-8 w-8 text-white" />
           </div>
           <h2 className="mt-6 text-2xl font-bold text-foreground">Registration submitted 🎉</h2>
           <p className="mt-3 text-sm text-muted-foreground">
-            Your registration will be confirmed by {tenant.name} after payment verification.
-            You'll usually hear back within a day.
+            Your registration will be confirmed by {tenant.name} after payment verification. You'll
+            usually hear back within a day.
           </p>
           {waHref ? (
             <a
@@ -330,7 +396,17 @@ function RegisterContent() {
   );
 }
 
-function StepPill({ n, label, active, done }: { n: number; label: string; active: boolean; done: boolean }) {
+function StepPill({
+  n,
+  label,
+  active,
+  done,
+}: {
+  n: number;
+  label: string;
+  active: boolean;
+  done: boolean;
+}) {
   const on = active || done;
   return (
     <div
@@ -338,7 +414,9 @@ function StepPill({ n, label, active, done }: { n: number; label: string; active
       style={{
         borderColor: on ? "var(--brand)" : "hsl(var(--border))",
         color: on ? "var(--brand)" : "hsl(var(--muted-foreground))",
-        backgroundColor: active ? "color-mix(in oklab, var(--brand) 8%, transparent)" : "transparent",
+        backgroundColor: active
+          ? "color-mix(in oklab, var(--brand) 8%, transparent)"
+          : "transparent",
       }}
     >
       <span
@@ -353,13 +431,23 @@ function StepPill({ n, label, active, done }: { n: number; label: string; active
 }
 
 function Field({
-  label, value, onChange, type = "text", placeholder,
+  label,
+  value,
+  onChange,
+  type = "text",
+  placeholder,
 }: {
-  label: string; value: string; onChange: (v: string) => void; type?: string; placeholder?: string;
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  type?: string;
+  placeholder?: string;
 }) {
   return (
     <label className="block">
-      <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{label}</span>
+      <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+        {label}
+      </span>
       <input
         type={type}
         value={value}
@@ -375,20 +463,30 @@ function Field({
 }
 
 function SelectField({
-  label, value, onChange, options,
+  label,
+  value,
+  onChange,
+  options,
 }: {
-  label: string; value: string; onChange: (v: string) => void; options: { value: string; label: string }[];
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  options: { value: string; label: string }[];
 }) {
   return (
     <label className="block">
-      <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{label}</span>
+      <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+        {label}
+      </span>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
         className="mt-1.5 block w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground shadow-sm outline-none"
       >
         {options.map((o) => (
-          <option key={o.value} value={o.value}>{o.label}</option>
+          <option key={o.value} value={o.value}>
+            {o.label}
+          </option>
         ))}
       </select>
     </label>
