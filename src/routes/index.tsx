@@ -4,6 +4,7 @@ import { ArrowRight, Phone, MessageCircle, Sparkles } from "lucide-react";
 import { TenantGate } from "@/components/site/TenantGate";
 import { useTenant, useTenantState } from "@/lib/tenant-context";
 import { feePlansQuery, sectionsBy, sectionOne, siteContentQuery } from "@/lib/site-queries";
+import { signedUrl } from "@/lib/storage";
 
 export const Route = createFileRoute("/")({
   component: HomeRoute,
@@ -18,6 +19,8 @@ function HomeRoute() {
 }
 
 type Hero = { headline?: string; subheadline?: string; cta_label?: string; image_url?: string };
+type About = { heading?: string; body?: string };
+type Owner = { name?: string; role?: string; photo_url?: string };
 type StarPlayer = { name: string; achievement: string; photo_url?: string | null };
 
 function HomeContent() {
@@ -25,6 +28,13 @@ function HomeContent() {
   const { data: sections = [] } = useQuery(siteContentQuery(tenant.id));
   const { data: fees = [] } = useQuery(feePlansQuery(tenant.id));
   const hero = sectionOne<Hero>(sections, "hero");
+  const about = sectionOne<About>(sections, "about");
+  const owner = sectionOne<Owner>(sections, "owner");
+  const { data: ownerPhoto = "" } = useQuery({
+    queryKey: ["owner-photo", owner?.photo_url],
+    queryFn: () => signedUrl(owner!.photo_url!),
+    enabled: !!owner?.photo_url,
+  });
   const stars = sectionsBy(sections, "star_players").map((s) => s.content as StarPlayer);
   const monthly = fees.filter((f) => f.type === "monthly").slice(0, 3);
 
@@ -40,19 +50,61 @@ function HomeContent() {
         }}
       >
         <div className="absolute inset-0 opacity-20 [background-image:radial-gradient(white_1px,transparent_1px)] [background-size:24px_24px]" />
+        {tenant.niche === "academy" ? (
+          <div
+            aria-hidden="true"
+            className="cricket-ball-float pointer-events-none absolute -right-8 top-8 hidden opacity-90 sm:block md:-right-4 md:top-14"
+          >
+            <svg
+              width="120"
+              height="120"
+              viewBox="0 0 100 100"
+              className="cricket-ball-spin drop-shadow-2xl"
+            >
+              <circle cx="50" cy="50" r="46" fill="#b91c1c" stroke="#7f1d1d" strokeWidth="1.5" />
+              <circle cx="50" cy="50" r="46" fill="url(#ball-shine)" />
+              <path
+                d="M 50 4 A 46 46 0 0 1 50 96"
+                fill="none"
+                stroke="white"
+                strokeWidth="2"
+                strokeDasharray="3 3"
+              />
+              <path
+                d="M 50 4 A 46 46 0 0 0 50 96"
+                fill="none"
+                stroke="white"
+                strokeWidth="2"
+                strokeDasharray="3 3"
+              />
+              <defs>
+                <radialGradient id="ball-shine" cx="35%" cy="30%" r="60%">
+                  <stop offset="0%" stopColor="white" stopOpacity="0.35" />
+                  <stop offset="100%" stopColor="white" stopOpacity="0" />
+                </radialGradient>
+              </defs>
+            </svg>
+          </div>
+        ) : null}
         <div className="relative mx-auto max-w-6xl px-4 py-20 sm:px-6 md:py-28 lg:py-32">
           <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-medium uppercase tracking-wider text-white/90 backdrop-blur">
+            <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-medium uppercase tracking-wider text-white/90 backdrop-blur">
               <Sparkles className="h-3.5 w-3.5" />
-              {tenant.niche === "gym" ? "Modern gym" : tenant.niche === "tuition" ? "Learning centre" : "Sports academy"}
+              {tenant.niche === "gym"
+                ? "Modern gym"
+                : tenant.niche === "tuition"
+                  ? "Learning centre"
+                  : "Sports academy"}
             </div>
-            <h1 className="mt-6 text-4xl font-bold leading-[1.05] tracking-tight text-white sm:text-5xl md:text-6xl lg:text-7xl">
+            <h1 className="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100 fill-mode-both mt-6 text-4xl font-bold leading-[1.05] tracking-tight text-white sm:text-5xl md:text-6xl lg:text-7xl">
               {hero?.headline ?? tenant.tagline ?? tenant.name}
             </h1>
             {hero?.subheadline ? (
-              <p className="mt-6 max-w-2xl text-lg text-white/80 sm:text-xl">{hero.subheadline}</p>
+              <p className="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200 fill-mode-both mt-6 max-w-2xl text-lg text-white/80 sm:text-xl">
+                {hero.subheadline}
+              </p>
             ) : null}
-            <div className="mt-10 flex flex-wrap gap-3">
+            <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300 fill-mode-both mt-10 flex flex-wrap gap-3">
               <Link
                 to="/register"
                 className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-neutral-900 shadow-lg transition-transform hover:scale-[1.02]"
@@ -78,9 +130,18 @@ function HomeContent() {
       <section className="border-b border-border/60 bg-background">
         <div className="mx-auto grid max-w-6xl gap-8 px-4 py-16 sm:px-6 md:grid-cols-3">
           {[
-            { title: "Certified coaches", body: "Experienced, trained mentors focused on real skill-building." },
-            { title: "Small batches", body: "Personal attention with structured curriculum and clear milestones." },
-            { title: "Transparent fees", body: "One clear price. No surprises, no hidden charges." },
+            {
+              title: "Certified coaches",
+              body: "Experienced, trained mentors focused on real skill-building.",
+            },
+            {
+              title: "Small batches",
+              body: "Personal attention with structured curriculum and clear milestones.",
+            },
+            {
+              title: "Transparent fees",
+              body: "One clear price. No surprises, no hidden charges.",
+            },
           ].map((h) => (
             <div key={h.title}>
               <div className="h-1 w-10 rounded-full" style={{ backgroundColor: "var(--brand)" }} />
@@ -91,20 +152,76 @@ function HomeContent() {
         </div>
       </section>
 
+      {/* About */}
+      {about?.body ? (
+        <section className="bg-background py-16">
+          <div className="mx-auto max-w-4xl px-4 sm:px-6">
+            {about.heading ? (
+              <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+                {about.heading}
+              </h2>
+            ) : null}
+            <p className="mt-4 text-base leading-relaxed text-muted-foreground sm:text-lg">
+              {about.body}
+            </p>
+          </div>
+        </section>
+      ) : null}
+
+      {/* Owner / coach */}
+      {owner?.name ? (
+        <section className="bg-muted/30 py-16">
+          <div className="mx-auto max-w-4xl px-4 sm:px-6">
+            <div className="flex flex-col items-center gap-6 text-center sm:flex-row sm:text-left">
+              <div
+                className="h-28 w-28 shrink-0 overflow-hidden rounded-full shadow-lg"
+                style={{ backgroundColor: "var(--brand)" }}
+              >
+                {ownerPhoto ? (
+                  <img src={ownerPhoto} alt={owner.name} className="h-full w-full object-cover" />
+                ) : (
+                  <div className="grid h-full w-full place-items-center text-3xl font-bold text-white">
+                    {owner.name.charAt(0)}
+                  </div>
+                )}
+              </div>
+              <div>
+                <div
+                  className="text-xs font-semibold uppercase tracking-widest"
+                  style={{ color: "var(--brand)" }}
+                >
+                  Meet your coach
+                </div>
+                <h2 className="mt-2 text-2xl font-bold text-foreground sm:text-3xl">
+                  {owner.name}
+                </h2>
+                {owner.role ? <p className="mt-1 text-muted-foreground">{owner.role}</p> : null}
+              </div>
+            </div>
+          </div>
+        </section>
+      ) : null}
+
       {/* Star players */}
       {stars.length > 0 ? (
         <section className="bg-muted/30 py-16">
           <div className="mx-auto max-w-6xl px-4 sm:px-6">
             <div className="flex items-end justify-between gap-4">
               <div>
-                <div className="text-xs font-semibold uppercase tracking-widest" style={{ color: "var(--brand)" }}>
+                <div
+                  className="text-xs font-semibold uppercase tracking-widest"
+                  style={{ color: "var(--brand)" }}
+                >
                   Our champions
                 </div>
                 <h2 className="mt-2 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
                   Star players
                 </h2>
               </div>
-              <Link to="/star-players" className="hidden text-sm font-medium text-muted-foreground hover:text-foreground sm:inline">
+              <Link
+                to="/star-players"
+                className="hidden text-sm font-medium text-muted-foreground hover:text-foreground sm:inline"
+              >
                 See all →
               </Link>
             </div>
@@ -134,21 +251,32 @@ function HomeContent() {
         <section className="bg-background py-16">
           <div className="mx-auto max-w-6xl px-4 sm:px-6">
             <div className="max-w-2xl">
-              <div className="text-xs font-semibold uppercase tracking-widest" style={{ color: "var(--brand)" }}>
+              <div
+                className="text-xs font-semibold uppercase tracking-widest"
+                style={{ color: "var(--brand)" }}
+              >
                 Simple pricing
               </div>
-              <h2 className="mt-2 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">Monthly plans</h2>
-              <p className="mt-3 text-muted-foreground">Choose what fits. See all plans and one-time fees on the fees page.</p>
+              <h2 className="mt-2 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+                Monthly plans
+              </h2>
+              <p className="mt-3 text-muted-foreground">
+                Choose what fits. See all plans and one-time fees on the fees page.
+              </p>
             </div>
             <div className="mt-8 grid gap-4 md:grid-cols-3">
               {monthly.map((p) => (
                 <div key={p.id} className="rounded-2xl border border-border/60 bg-card p-6">
                   <div className="text-sm font-medium text-muted-foreground">{p.name}</div>
                   <div className="mt-3 flex items-baseline gap-1">
-                    <span className="text-3xl font-bold text-foreground">₹{p.amount.toLocaleString("en-IN")}</span>
+                    <span className="text-3xl font-bold text-foreground">
+                      ₹{p.amount.toLocaleString("en-IN")}
+                    </span>
                     <span className="text-sm text-muted-foreground">/month</span>
                   </div>
-                  {p.description ? <p className="mt-3 text-sm text-muted-foreground">{p.description}</p> : null}
+                  {p.description ? (
+                    <p className="mt-3 text-sm text-muted-foreground">{p.description}</p>
+                  ) : null}
                 </div>
               ))}
             </div>
@@ -163,9 +291,16 @@ function HomeContent() {
 
       {/* CTA */}
       <section className="bg-muted/40 py-16">
-        <div className="mx-auto max-w-4xl rounded-3xl px-6 py-14 text-center sm:px-10" style={{ backgroundColor: "var(--brand-ink)" }}>
-          <h2 className="text-3xl font-bold text-white sm:text-4xl">Ready to join {tenant.name}?</h2>
-          <p className="mt-3 text-white/70">Fill the online registration form and we'll take it from there.</p>
+        <div
+          className="mx-auto max-w-4xl rounded-3xl px-6 py-14 text-center sm:px-10"
+          style={{ backgroundColor: "var(--brand-ink)" }}
+        >
+          <h2 className="text-3xl font-bold text-white sm:text-4xl">
+            Ready to join {tenant.name}?
+          </h2>
+          <p className="mt-3 text-white/70">
+            Fill the online registration form and we'll take it from there.
+          </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link
               to="/register"

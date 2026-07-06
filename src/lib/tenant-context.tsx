@@ -77,7 +77,9 @@ export function TenantProvider({ children }: { children: ReactNode }) {
 
       // Meta description + og
       const setMeta = (attr: "name" | "property", key: string, value: string) => {
-        let el = document.head.querySelector<HTMLMetaElement>(`meta[${attr}="${key}"][data-tenant="1"]`);
+        let el = document.head.querySelector<HTMLMetaElement>(
+          `meta[${attr}="${key}"][data-tenant="1"]`,
+        );
         if (!el) {
           el = document.createElement("meta");
           el.setAttribute(attr, key);

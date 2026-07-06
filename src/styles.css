@@ -142,3 +142,37 @@
     color: var(--color-foreground);
   }
 }
+
+@keyframes cricket-ball-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes cricket-ball-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-16px);
+  }
+}
+
+.cricket-ball-float {
+  animation: cricket-ball-float 4.5s ease-in-out infinite;
+}
+
+.cricket-ball-spin {
+  animation: cricket-ball-spin 14s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cricket-ball-float,
+  .cricket-ball-spin {
+    animation: none;
+  }
+}
