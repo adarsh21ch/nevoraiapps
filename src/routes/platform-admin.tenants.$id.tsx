@@ -425,8 +425,13 @@ function DomainEditor({ tenant, onSaved }: { tenant: Tenant; onSaved: () => void
   });
 
   const d = domain.trim().toLowerCase();
-  const isWildcardCovered =
+  // A subdomain of the platform's own nevorai.com. NOTE: there is NO wildcard
+  // route anymore — the old *.nevorai.com wildcard was removed after it hijacked
+  // cdn.nevorai.com and broke nFlow's video delivery. Each subdomain now needs a
+  // DNS record + a per-subdomain worker route created manually.
+  const isPlatformSubdomain =
     d.endsWith(PLATFORM_WILDCARD_SUFFIX) && d !== PLATFORM_WILDCARD_SUFFIX.slice(1);
+  const subLabel = d ? d.slice(0, -PLATFORM_WILDCARD_SUFFIX.length) : "slug";
   const hostForCname = d
     ? d.split(".").length <= 2
       ? "@"
@@ -443,16 +448,38 @@ function DomainEditor({ tenant, onSaved }: { tenant: Tenant; onSaved: () => void
     >
       <PField label="Domain (e.g. app.kirklandcricket.in)" value={domain} onChange={setDomain} />
 
-      {isWildcardCovered ? (
-        <div className="rounded-md border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs text-emerald-200 space-y-1.5">
-          <div className="font-semibold text-emerald-100 flex items-center gap-1">
-            <Info className="size-3" /> No DNS setup needed
+      {isPlatformSubdomain ? (
+        <div className="rounded-md border border-white/10 bg-neutral-950 p-3 text-xs text-neutral-300 space-y-1.5">
+          <div className="font-semibold text-white flex items-center gap-1">
+            <Info className="size-3" /> Setup for a nevorai.com subdomain
           </div>
           <p>
-            <strong>{d}</strong> is already covered by the platform's{" "}
-            <code className="bg-black/30 px-1 rounded">*{PLATFORM_WILDCARD_SUFFIX}</code> wildcard.
-            Just save — it goes live immediately.
+            There is <strong>no wildcard</strong> route on{" "}
+            <code className="bg-black/30 px-1 rounded">{PLATFORM_WILDCARD_SUFFIX.slice(1)}</code> —
+            it was removed because it hijacked <code>cdn.nevorai.com</code>. Saving here is not
+            enough; do these two manual steps in the Cloudflare dashboard:
           </p>
+          <ol className="list-decimal list-inside space-y-1 text-neutral-300">
+            <li>
+              <strong>DNS</strong> (nevorai.com zone → DNS → Records): add a{" "}
+              <strong>proxied</strong> (orange-cloud) record for host{" "}
+              <code className="bg-black/30 px-1 rounded">{subLabel}</code>. A CNAME to{" "}
+              <code className="bg-black/30 px-1 rounded">{PLATFORM_HOSTNAME}</code> (or an A record
+              to a Cloudflare-proxied IP) — the target doesn't matter as long as it's proxied.
+            </li>
+            <li>
+              <strong>Worker route</strong> (Workers &amp; Pages →{" "}
+              <code>adarsh21ch-nevoraiapps</code> → Settings → Domains &amp; Routes → Add route):
+              add route{" "}
+              <code className="bg-black/30 px-1 rounded">{d || "slug.nevorai.com"}/*</code> on zone{" "}
+              <code>nevorai.com</code>.
+            </li>
+          </ol>
+          <div className="rounded border border-amber-500/30 bg-amber-500/10 p-2 text-amber-200">
+            Use the manual <strong>Add route</strong> path above — the "Add Domain" / "Custom
+            Domain" buttons have been unreliable and fail silently. Never re-create a{" "}
+            <code>*{PLATFORM_WILDCARD_SUFFIX}</code> wildcard — it breaks nFlow's live CDN.
+          </div>
         </div>
       ) : (
         <div className="rounded-md border border-white/10 bg-neutral-950 p-3 text-xs text-neutral-300 space-y-1.5">

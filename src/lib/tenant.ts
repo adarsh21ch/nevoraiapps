@@ -18,6 +18,9 @@ export function getFeatures(t: Tenant | null | undefined): TenantFeatures {
   return t.features as TenantFeatures;
 }
 
+/** Slugs reserved for platform infrastructure, never assignable to tenants. */
+const RESERVED_SLUGS = new Set(["academy", "www", "app", "api", "admin", "flow"]);
+
 /**
  * Resolve which tenant slug to load for the current request.
  * Priority: custom_domain match → {slug}.host → path /a/{slug} → ?tenant=slug.
@@ -62,7 +65,7 @@ export function resolveTenantHint(input: {
     // Ignore lovable preview subdomains like id-preview--xxx.lovable.app
     if (parts.length > 2 && !parts[0].includes("--") && !parts[0].startsWith("id-preview")) {
       const first = parts[0];
-      if (first && first !== "www") return { mode: "slug", value: first };
+      if (first && !RESERVED_SLUGS.has(first)) return { mode: "slug", value: first };
     }
     return null;
   }

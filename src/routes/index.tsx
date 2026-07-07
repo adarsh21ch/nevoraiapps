@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowRight, Phone, MessageCircle, Sparkles } from "lucide-react";
 import { TenantGate } from "@/components/site/TenantGate";
+import { PitchStripes, PitchWatermark, SeamDivider } from "@/components/site/PitchPattern";
 import { useTenant, useTenantState } from "@/lib/tenant-context";
 import { feePlansQuery, sectionsBy, sectionOne, siteContentQuery } from "@/lib/site-queries";
 import { signedUrl } from "@/lib/storage";
@@ -39,6 +40,7 @@ function HomeContent() {
   const monthly = fees.filter((f) => f.type === "monthly").slice(0, 3);
 
   const wa = tenant.whatsapp?.replace(/[^\d]/g, "");
+  const isPitch = tenant.niche === "academy";
 
   return (
     <>
@@ -49,7 +51,14 @@ function HomeContent() {
           background: `linear-gradient(135deg, ${tenant.primary_color}, ${tenant.secondary_color})`,
         }}
       >
-        <div className="absolute inset-0 opacity-20 [background-image:radial-gradient(white_1px,transparent_1px)] [background-size:24px_24px]" />
+        {isPitch ? (
+          <>
+            <PitchStripes className="absolute inset-0 h-full w-full" />
+            <PitchWatermark className="absolute -right-10 -top-10 h-[420px] w-[420px] sm:h-[520px] sm:w-[520px]" />
+          </>
+        ) : (
+          <div className="absolute inset-0 opacity-20 [background-image:radial-gradient(white_1px,transparent_1px)] [background-size:24px_24px]" />
+        )}
         <div className="relative mx-auto max-w-6xl px-4 py-20 sm:px-6 md:py-28 lg:py-32">
           <div className="max-w-3xl">
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-medium uppercase tracking-wider text-white/90 backdrop-blur">
@@ -89,6 +98,13 @@ function HomeContent() {
           </div>
         </div>
       </section>
+
+      {isPitch ? (
+        <SeamDivider
+          className="h-3 w-full text-foreground/40"
+          style={{ color: tenant.primary_color }}
+        />
+      ) : null}
 
       {/* Highlights */}
       <section className="border-b border-border/60 bg-background">
