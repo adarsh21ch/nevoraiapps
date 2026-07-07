@@ -1,6 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowRight, Phone, MessageCircle, Sparkles } from "lucide-react";
+import {
+  ArrowRight,
+  Phone,
+  MessageCircle,
+  Sparkles,
+  Users,
+  Trophy,
+  ShieldCheck,
+} from "lucide-react";
 import { TenantGate } from "@/components/site/TenantGate";
 import { PitchStripes, PitchWatermark, SeamDivider } from "@/components/site/PitchPattern";
 import { useTenant, useTenantState } from "@/lib/tenant-context";
@@ -36,6 +44,11 @@ function HomeContent() {
     queryFn: () => signedUrl(owner!.photo_url!),
     enabled: !!owner?.photo_url,
   });
+  const { data: heroImage = "" } = useQuery({
+    queryKey: ["hero-image", hero?.image_url],
+    queryFn: () => signedUrl(hero!.image_url!),
+    enabled: !!hero?.image_url,
+  });
   const stars = sectionsBy(sections, "star_players").map((s) => s.content as StarPlayer);
   const monthly = fees.filter((f) => f.type === "monthly").slice(0, 3);
 
@@ -51,7 +64,22 @@ function HomeContent() {
           background: `linear-gradient(135deg, ${tenant.primary_color}, ${tenant.secondary_color})`,
         }}
       >
-        {isPitch ? (
+        {heroImage ? (
+          <>
+            <img
+              src={heroImage}
+              alt=""
+              className="absolute inset-0 h-full w-full object-cover"
+              aria-hidden="true"
+            />
+            <div
+              className="absolute inset-0"
+              style={{
+                background: `linear-gradient(115deg, color-mix(in oklab, ${tenant.secondary_color} 88%, black) 0%, color-mix(in oklab, ${tenant.secondary_color} 55%, transparent) 45%, transparent 75%)`,
+              }}
+            />
+          </>
+        ) : isPitch ? (
           <>
             <PitchStripes className="absolute inset-0 h-full w-full" />
             <PitchWatermark className="absolute -right-10 -top-10 h-[420px] w-[420px] sm:h-[520px] sm:w-[520px]" />
@@ -108,23 +136,31 @@ function HomeContent() {
 
       {/* Highlights */}
       <section className="border-b border-border/60 bg-background">
-        <div className="mx-auto grid max-w-6xl gap-8 px-4 py-16 sm:px-6 md:grid-cols-3">
+        <div className="mx-auto grid max-w-6xl gap-6 px-4 py-16 sm:px-6 md:grid-cols-3">
           {[
             {
+              icon: Users,
               title: "Certified coaches",
               body: "Experienced, trained mentors focused on real skill-building.",
             },
             {
-              title: "Small batches",
-              body: "Personal attention with structured curriculum and clear milestones.",
+              icon: Trophy,
+              title: "Structured training",
+              body: "Personal attention with a clear curriculum and real milestones.",
             },
             {
+              icon: ShieldCheck,
               title: "Transparent fees",
               body: "One clear price. No surprises, no hidden charges.",
             },
           ].map((h) => (
-            <div key={h.title}>
-              <div className="h-1 w-10 rounded-full" style={{ backgroundColor: "var(--brand)" }} />
+            <div key={h.title} className="rounded-2xl border border-border/60 bg-card p-6">
+              <div
+                className="grid size-11 place-items-center rounded-xl"
+                style={{ backgroundColor: "color-mix(in oklab, var(--brand) 14%, transparent)" }}
+              >
+                <h.icon className="size-5" style={{ color: "var(--brand)" }} />
+              </div>
               <h3 className="mt-4 text-lg font-semibold text-foreground">{h.title}</h3>
               <p className="mt-2 text-sm text-muted-foreground">{h.body}</p>
             </div>

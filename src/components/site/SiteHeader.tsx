@@ -22,7 +22,11 @@ export function SiteHeader() {
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
         <Link to="/" className="flex items-center gap-3" onClick={() => setOpen(false)}>
           {tenant.logo_url ? (
-            <img src={tenant.logo_url} alt={tenant.name} className="h-9 w-9 rounded-lg object-cover" />
+            <img
+              src={tenant.logo_url}
+              alt={tenant.name}
+              className="h-9 w-9 rounded-lg object-cover"
+            />
           ) : (
             <div
               className="flex h-9 w-9 items-center justify-center rounded-lg text-sm font-bold text-white shadow-sm"
@@ -32,7 +36,9 @@ export function SiteHeader() {
             </div>
           )}
           <div className="leading-tight">
-            <div className="text-sm font-semibold tracking-tight text-foreground">{tenant.name}</div>
+            <div className="text-sm font-semibold tracking-tight text-foreground">
+              {tenant.name}
+            </div>
             {tenant.tagline ? (
               <div className="text-[11px] text-muted-foreground">{tenant.tagline}</div>
             ) : null}
@@ -42,18 +48,14 @@ export function SiteHeader() {
         <nav className="hidden items-center gap-1 md:flex">
           {nav.map((item) => {
             const active =
-              item.to === "/"
-                ? location.pathname === "/"
-                : location.pathname.startsWith(item.to);
+              item.to === "/" ? location.pathname === "/" : location.pathname.startsWith(item.to);
             return (
               <Link
                 key={item.to}
                 to={item.to}
                 className={cn(
                   "rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
-                  active
-                    ? "text-foreground"
-                    : "text-muted-foreground hover:text-foreground",
+                  active ? "text-foreground" : "text-muted-foreground hover:text-foreground",
                 )}
                 style={active ? { color: "var(--brand)" } : undefined}
               >
@@ -61,9 +63,15 @@ export function SiteHeader() {
               </Link>
             );
           })}
+          <a
+            href="/auth"
+            className="ml-2 rounded-full border border-border px-4 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+          >
+            Owner login
+          </a>
           <Link
             to="/register"
-            className="ml-2 rounded-full px-4 py-2 text-sm font-semibold text-white shadow-sm transition-opacity hover:opacity-90"
+            className="rounded-full px-4 py-2 text-sm font-semibold text-white shadow-sm transition-opacity hover:opacity-90"
             style={{ backgroundColor: "var(--brand)" }}
           >
             Register
